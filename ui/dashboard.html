@@ -1,0 +1,1209 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>THTrueMi Data Watch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+:root {
+  --bg: #FFFFFF;
+  --ink: #0A0A0B;
+  --ink-2: #4B4C52;
+  --ink-3: #85868D;
+  --line: #E7E7EA;
+  --line-2: #D3D3D8;
+  --card: #F3F3F5;
+  --card-2: #FFFFFF;
+  --dark: #0A0A0B;
+  --dark-ink: #F4F4F6;
+  --dark-line: #27272D;
+  --accent: #2448FF;
+  --pass: #0E9A57;
+  --pass-bg: rgba(14, 154, 87, .12);
+  --fail: #D8343D;
+  --fail-bg: rgba(216, 52, 61, .11);
+  --warn: #A86D00;
+  --warn-bg: rgba(233, 160, 20, .17);
+  --st-baseline: #2448FF;
+  --st-corrupted: #E03CC2;
+  --st-repaired: #0E9A57;
+  --shadow: 0 12px 32px rgba(10, 10, 30, .08), 0 1px 2px rgba(10, 10, 30, .06);
+  --display: "Be Vietnam Pro", "Helvetica Neue", Arial, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --ease: cubic-bezier(.2, .8, .2, 1);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
+    --bg: #09090A;
+    --ink: #F2F2F4;
+    --ink-2: #B4B5BC;
+    --ink-3: #7A7B83;
+    --line: #232327;
+    --line-2: #34343A;
+    --card: #141417;
+    --card-2: #0F0F11;
+    --dark: #1A1A1E;
+    --dark-line: #2E2E34;
+    --accent: #6F8BFF;
+    --pass: #3FD68A;
+    --pass-bg: rgba(63, 214, 138, .14);
+    --fail: #FF6B72;
+    --fail-bg: rgba(255, 107, 114, .14);
+    --warn: #F4B942;
+    --warn-bg: rgba(244, 185, 66, .14);
+    --st-baseline: #6F8BFF;
+    --st-corrupted: #F25BD6;
+    --st-repaired: #3FD68A;
+    --shadow: 0 12px 32px rgba(0, 0, 0, .55);
+  }
+}
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #09090A;
+  --ink: #F2F2F4;
+  --ink-2: #B4B5BC;
+  --ink-3: #7A7B83;
+  --line: #232327;
+  --line-2: #34343A;
+  --card: #141417;
+  --card-2: #0F0F11;
+  --dark: #1A1A1E;
+  --dark-line: #2E2E34;
+  --accent: #6F8BFF;
+  --pass: #3FD68A;
+  --pass-bg: rgba(63, 214, 138, .14);
+  --fail: #FF6B72;
+  --fail-bg: rgba(255, 107, 114, .14);
+  --warn: #F4B942;
+  --warn-bg: rgba(244, 185, 66, .14);
+  --st-baseline: #6F8BFF;
+  --st-corrupted: #F25BD6;
+  --st-repaired: #3FD68A;
+  --shadow: 0 12px 32px rgba(0, 0, 0, .55);
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 400 16px/1.55 var(--display);
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+a { color: inherit; }
+button { font: inherit; color: inherit; }
+code, .mono { font-family: var(--mono); }
+code { font-size: .88em; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 6px; }
+
+.wrap { width: 100%; max-width: 1320px; margin-inline: auto; padding-inline: clamp(16px, 4vw, 56px); }
+
+@keyframes grow { from { transform: scaleY(0); } }
+@keyframes rise { from { transform: translateY(10px); opacity: 0; } }
+@keyframes slide { from { transform: translateX(-10px); opacity: 0; } }
+@keyframes fade { from { opacity: 0; } }
+
+/* ---------- Header ---------- */
+.top {
+  position: absolute; inset: 0 0 auto 0; z-index: 3;
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
+  padding-block: 24px;
+}
+.brand { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; font-weight: 800; font-size: 22px; letter-spacing: -.03em; }
+.brand svg { width: 24px; height: 24px; }
+.brand svg rect { transition: transform .4s var(--ease); transform-box: fill-box; transform-origin: center; }
+.brand:hover svg rect:nth-child(1) { transform: translate(12px, 12px); }
+.brand:hover svg rect:nth-child(2) { transform: translate(-12px, -12px); }
+.top-r { display: flex; align-items: center; gap: 10px; }
+.switch {
+  display: flex; align-items: center; gap: 2px;
+  background: var(--card-2); border-radius: 999px; padding: 5px; box-shadow: var(--shadow);
+}
+.switch button {
+  display: inline-flex; align-items: center; gap: 8px;
+  border: 0; background: transparent; cursor: pointer;
+  padding: 8px 14px; border-radius: 999px;
+  font-size: 15px; font-weight: 600; color: var(--ink-3);
+  transition: color .2s, background-color .2s;
+}
+.switch button:hover { color: var(--ink); }
+.switch button[aria-pressed="true"] { color: var(--ink); background: var(--card); }
+.switch button::before {
+  content: ""; width: 0; height: 18px; border-radius: 5px; background: var(--sq, var(--ink));
+  transition: width .3s var(--ease);
+}
+.switch button[aria-pressed="true"]::before { width: 18px; }
+.switch [data-state="baseline"] { --sq: var(--st-baseline); }
+.switch [data-state="corrupted"] { --sq: var(--st-corrupted); }
+.switch [data-state="repaired"] { --sq: var(--st-repaired); }
+.round {
+  display: grid; place-items: center; width: 44px; height: 44px; flex: none;
+  border-radius: 50%; background: var(--card-2); box-shadow: var(--shadow); text-decoration: none;
+  transition: transform .3s var(--ease);
+}
+.round:hover { transform: rotate(45deg); }
+.round svg { width: 16px; height: 16px; }
+
+/* ---------- Hero ---------- */
+.hero { position: relative; isolation: isolate; }
+#fx { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; }
+.hero-in { position: relative; z-index: 1; padding-block: 148px 96px; text-align: center; }
+h1 {
+  margin: 0; font-weight: 800; letter-spacing: -.05em; line-height: 1.12;
+  font-size: min(12vw, 184px);
+}
+h1 .line { display: block; white-space: nowrap; }
+.lede { margin: 32px auto 0; max-width: 38ch; font-size: clamp(16px, 1.6vw, 19px); color: var(--ink); text-wrap: balance; }
+.state-line {
+  margin: 20px auto 0; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px 12px;
+  font-size: 14px; color: var(--ink-2);
+}
+.state-line > * { animation: rise .5s var(--ease) both; }
+.state-line > :nth-child(2) { animation-delay: .08s; }
+.eyebrow { font: 500 11px/1.2 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--ink-3); }
+.state-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  font: 500 12px/1 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink);
+}
+.state-tag::before { content: ""; width: 10px; height: 10px; border-radius: 3px; background: var(--st-now); }
+:root { --st-now: var(--st-baseline); }
+:root[data-state="corrupted"] { --st-now: var(--st-corrupted); }
+:root[data-state="repaired"] { --st-now: var(--st-repaired); }
+
+/* ---------- Live row ---------- */
+.live { display: flex; align-items: center; gap: 16px; margin-block: 8px 28px; }
+.live .rule { flex: 1; height: 1px; background: var(--line); transform-origin: left; animation: grow-x 1.2s .4s var(--ease) both; }
+@keyframes grow-x { from { transform: scaleX(0); } }
+.live .src { display: inline-flex; align-items: center; gap: 10px; }
+.live .ico { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 8px; background: var(--ink); color: var(--bg); }
+.live .ico svg { width: 15px; height: 15px; }
+.pulse { width: 7px; height: 7px; border-radius: 50%; background: var(--pass); animation: pulse 2s infinite; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(63, 214, 138, .45); } 70% { box-shadow: 0 0 0 8px rgba(63, 214, 138, 0); } 100% { box-shadow: 0 0 0 0 rgba(63, 214, 138, 0); } }
+
+/* ---------- Cards ---------- */
+.grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+.span-2 { grid-column: span 2; }
+.span-3 { grid-column: 1 / -1; }
+.card {
+  min-width: 0; border-radius: 26px; padding: clamp(20px, 2.4vw, 30px); display: flex; flex-direction: column; gap: 22px;
+  transition: transform .9s var(--ease); transition-delay: var(--d, 0s);
+}
+.card.pre { transform: translateY(48px) scale(.98); }
+.card.grey { background: var(--card); }
+.card.plain { background: var(--card-2); border: 1px solid var(--line); }
+.card.dark {
+  background: var(--dark); color: var(--dark-ink); border: 1px solid var(--dark-line);
+  --ink: #F4F4F6; --ink-2: #B9BAC1; --ink-3: #85868E; --line: #2A2A30; --line-2: #3A3A41; --card: #18181C; --card-2: #111114;
+  --pass: #3FD68A; --pass-bg: rgba(63, 214, 138, .15); --fail: #FF6B72; --fail-bg: rgba(255, 107, 114, .15); --warn: #F4B942; --warn-bg: rgba(244, 185, 66, .15);
+  --st-baseline: #6F8BFF; --st-corrupted: #F25BD6; --st-repaired: #3FD68A;
+}
+.card-h { display: flex; flex-direction: column; gap: 8px; }
+.card-h h2 { margin: 0; font-size: clamp(20px, 1.9vw, 24px); font-weight: 700; letter-spacing: -.02em; line-height: 1.2; text-wrap: balance; }
+.card-h p { margin: 0; color: var(--ink-2); font-size: 14.5px; max-width: 70ch; }
+.card-h h2, .card-h p { animation: rise .5s var(--ease) both; }
+.foot-note { margin: 0; font-size: 13.5px; color: var(--ink-2); }
+.foot-note b { color: var(--ink); font-weight: 600; }
+
+.chip {
+  display: inline-flex; align-items: center; gap: 6px; white-space: nowrap;
+  font: 500 11px/1 var(--mono); letter-spacing: .08em; text-transform: uppercase;
+  padding: 6px 9px; border-radius: 999px; background: var(--card); color: var(--ink-2);
+}
+.chip.pass { background: var(--pass-bg); color: var(--pass); }
+.chip.fail { background: var(--fail-bg); color: var(--fail); }
+.chip.warn { background: var(--warn-bg); color: var(--warn); }
+.chip.soft { background: transparent; border: 1px solid var(--line-2); }
+
+/* Pipeline */
+.pipe { position: relative; padding-bottom: 52px; }
+#pipeFx { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.stages { position: relative; list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 14px; }
+.stage {
+  display: flex; flex-direction: column; gap: 6px; min-width: 0;
+  padding: 14px; border-radius: 16px; background: var(--card); border: 1px solid var(--line);
+  transition: border-color .4s, opacity .4s, box-shadow .4s;
+  animation: rise .55s var(--ease) both; animation-delay: calc(var(--i) * 55ms);
+}
+.stage .s-n { font: 500 11px/1 var(--mono); color: var(--ink-3); letter-spacing: .1em; }
+.stage b { font-size: 15px; font-weight: 600; line-height: 1.25; }
+.stage code { font-size: 11px; color: var(--ink-3); overflow-wrap: anywhere; }
+.stage .s-v { margin-top: auto; padding-top: 6px; font-size: 13.5px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.stage .chip { align-self: flex-start; }
+.stage.bad { border-color: var(--fail); box-shadow: 0 0 0 1px var(--fail), 0 0 28px rgba(255, 107, 114, .18); }
+.stage.good { border-color: rgba(63, 214, 138, .55); }
+.stage.warn { border-color: rgba(244, 185, 66, .6); }
+.stage.dim { opacity: .45; }
+
+/* Gate */
+.score { display: flex; align-items: flex-end; gap: 14px; flex-wrap: wrap; }
+.big { font-weight: 800; font-size: clamp(64px, 7vw, 96px); line-height: .85; letter-spacing: -.05em; font-variant-numeric: tabular-nums; }
+.big .of { color: var(--ink-3); }
+.checks { list-style: none; margin: 0; padding: 0; display: grid; }
+.checks li {
+  display: grid; grid-template-columns: 10px 1fr auto; align-items: center; gap: 12px; padding-block: 11px; border-top: 1px solid var(--line); font-size: 14.5px;
+  animation: slide .45s var(--ease) both; animation-delay: calc(var(--i) * 60ms);
+}
+.checks .det { font: 400 12.5px/1.2 var(--mono); color: var(--ink-3); text-align: right; }
+.checks li.bad .det { color: var(--fail); }
+.dot { width: 10px; height: 10px; border-radius: 3px; background: var(--pass); }
+.dot.bad { background: var(--fail); animation: blink 1.1s steps(2, jump-none) 3; }
+@keyframes blink { 50% { opacity: .2; } }
+.fresh { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; padding: 14px 16px; border-radius: 14px; background: var(--card); font-size: 14px; }
+
+/* Metrics */
+.metrics { display: grid; }
+.metric { display: grid; grid-template-columns: 1fr auto; align-items: end; gap: 16px; padding-block: 14px; border-top: 1px solid var(--line-2); }
+.metric:first-child { border-top: 0; padding-top: 0; }
+.m-label { font-size: 13.5px; color: var(--ink-2); }
+.m-val { font-weight: 800; font-size: clamp(30px, 3vw, 40px); letter-spacing: -.04em; line-height: 1.05; font-variant-numeric: tabular-nums; }
+.m-delta { font: 400 12px/1.3 var(--mono); color: var(--ink-3); }
+.m-delta.neg { color: var(--fail); }
+.bars { display: grid; grid-template-columns: repeat(3, 14px); gap: 6px; align-items: end; height: 64px; }
+.bar { display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 5px; height: 100%; }
+.bar i {
+  display: block; width: 100%; border-radius: 3px 3px 1px 1px; background: var(--line-2);
+  transform-origin: bottom; animation: grow .7s var(--ease) both; animation-delay: calc(var(--i) * 70ms);
+}
+.bar.cur i { background: var(--st-now); }
+.bar span { font: 500 10px/1 var(--mono); color: var(--ink-3); }
+
+/* Ages */
+.ages svg { display: block; width: 100%; height: auto; overflow: visible; }
+.ages rect { transform-box: fill-box; transform-origin: 50% 100%; animation: grow .6s var(--ease) both; animation-delay: calc(var(--i) * 35ms); }
+.ages .b-fresh { fill: var(--ink); }
+.ages .b-stale { fill: var(--fail); }
+.ages .axis { fill: var(--ink-3); font: 400 10px var(--mono); }
+.ages .cnt { fill: var(--ink-2); font: 500 10px var(--mono); animation: fade .4s .45s both; }
+.ages .grid-l { stroke: var(--line); stroke-width: 1; }
+.ages .thr { stroke: var(--fail); stroke-width: 1.5; stroke-dasharray: 4 4; animation: dash 1.2s linear infinite; }
+@keyframes dash { to { stroke-dashoffset: -16; } }
+.ages .thr-t { fill: var(--fail); font: 500 10px var(--mono); }
+.kv { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 12px; }
+.kv div { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.kv b { font-weight: 700; font-size: 14.5px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+/* Tree */
+.tree { display: grid; grid-template-columns: minmax(170px, 230px) minmax(0, 1fr); align-items: center; }
+.root-node { position: relative; margin-right: 28px; padding: 18px; border-radius: 16px; background: var(--card-2); border: 1px solid var(--line); display: grid; gap: 8px; }
+.root-node::after { content: ""; position: absolute; right: -29px; top: 50%; width: 28px; border-top: 1.5px solid var(--line-2); }
+.root-node b { font-size: 26px; font-weight: 800; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.root-node span { font-size: 13px; color: var(--ink-2); }
+.branches { list-style: none; margin: 0; padding: 0 0 0 28px; position: relative; display: grid; gap: 10px; }
+.branches::before { content: ""; position: absolute; left: 0; top: 30px; bottom: 30px; border-left: 1.5px solid var(--line-2); }
+.branches li { position: relative; animation: slide .5s var(--ease) both; animation-delay: calc(var(--i) * 70ms); }
+.branches li::before { content: ""; position: absolute; left: -28px; top: 50%; width: 28px; border-top: 1.5px solid var(--line-2); }
+.node {
+  width: 100%; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 4px 14px; text-align: left;
+  padding: 12px 14px; border-radius: 14px; border: 1px solid var(--line); background: var(--card-2); cursor: pointer;
+  transition: border-color .2s, transform .25s var(--ease), box-shadow .2s;
+}
+.node:hover { border-color: var(--line-2); transform: translateX(4px); }
+.node[aria-pressed="true"] { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
+.node .n-t { font-weight: 600; font-size: 15px; }
+.node .n-t small { font: 400 12px var(--mono); color: var(--ink-3); margin-left: 8px; }
+.node .n-s { grid-column: 1; font-size: 13px; color: var(--ink-2); }
+.node .chip { grid-column: 2; grid-row: 1 / span 2; }
+
+/* Lineage */
+.fp { display: grid; gap: 8px; }
+.fp div { display: grid; grid-template-columns: 84px 1fr auto; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; background: var(--card); font-size: 13px; animation: rise .45s var(--ease) both; animation-delay: calc(var(--i) * 80ms); }
+.fp code { color: var(--ink); letter-spacing: .02em; overflow: hidden; text-overflow: ellipsis; }
+.fp .now { box-shadow: inset 0 0 0 1px var(--st-now); }
+.rec { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.rec span:last-child { font-size: 14px; color: var(--ink-2); max-width: 22ch; }
+
+/* Questions */
+.qgrid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 12px; }
+.q {
+  display: flex; flex-direction: column; gap: 12px; text-align: left; cursor: pointer; min-width: 0;
+  padding: 14px; border-radius: 16px; border: 1px solid var(--line); background: var(--card-2);
+  transition: transform .25s var(--ease), border-color .2s, box-shadow .2s;
+  animation: rise .45s var(--ease) both; animation-delay: calc(var(--i) * 40ms);
+}
+.q:hover { transform: translateY(-3px); box-shadow: var(--shadow); }
+.q[aria-pressed="true"] { border-color: var(--ink); box-shadow: 0 0 0 1px var(--ink); }
+.q.deg { border-color: var(--fail); }
+.q.deg[aria-pressed="true"] { box-shadow: 0 0 0 1px var(--fail); }
+.q-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.q-top .mono { font-size: 12px; color: var(--ink-3); }
+.q-c { font-size: 13px; color: var(--ink-2); min-height: 2.6em; }
+.marks { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.mk { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 7px 0 6px; border-radius: 9px; background: var(--card); transition: box-shadow .3s; }
+.mk b { font-weight: 700; font-size: 15px; font-variant-numeric: tabular-nums; }
+.mk span { font: 500 9.5px/1 var(--mono); letter-spacing: .08em; color: var(--ink-3); }
+.mk.bad { background: var(--fail-bg); color: var(--fail); }
+.mk.bad span { color: var(--fail); }
+.mk.cur { box-shadow: inset 0 0 0 1.5px var(--st-now); }
+.qdetail { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; padding: 20px; border-radius: 18px; background: var(--card); animation: rise .4s var(--ease) both; }
+.qdetail .full { grid-column: 1 / -1; }
+.qdetail h3 { margin: 6px 0 0; font-size: 17px; font-weight: 600; line-height: 1.4; text-wrap: balance; }
+.qdetail p { margin: 6px 0 0; font-size: 14px; color: var(--ink-2); overflow-wrap: anywhere; }
+.qdetail p.empty { color: var(--fail); font-style: italic; }
+.docs { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.docs code { font-size: 11.5px; padding: 5px 8px; border-radius: 8px; background: var(--card-2); border: 1px solid var(--line); color: var(--ink-2); animation: fade .4s both; animation-delay: calc(var(--i) * 70ms); }
+.docs code.gt { border-color: var(--pass); color: var(--pass); background: var(--pass-bg); }
+
+/* Papers */
+.filters { display: flex; flex-wrap: wrap; gap: 8px; }
+.fchip {
+  border: 1px solid var(--line-2); background: var(--card-2); cursor: pointer;
+  padding: 7px 12px; border-radius: 999px; font-size: 13px; font-weight: 500; color: var(--ink-2);
+  transition: background-color .2s, color .2s, border-color .2s;
+}
+.fchip:hover { color: var(--ink); border-color: var(--ink-3); }
+.fchip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.fchip small { font-family: var(--mono); opacity: .7; margin-left: 4px; }
+.table-scroll { overflow-x: auto; margin-inline: -4px; padding-inline: 4px; }
+table { width: 100%; min-width: 820px; border-collapse: collapse; font-size: 14px; }
+th { text-align: left; font: 500 10.5px/1.2 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--ink-3); padding: 0 10px 12px; border-bottom: 1px solid var(--line-2); }
+td { padding: 13px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+tbody tr { animation: fade .4s both; animation-delay: calc(var(--i) * 22ms); transition: background-color .2s; }
+tbody tr:hover { background: var(--card); }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.t-title { font-weight: 500; line-height: 1.4; }
+.t-title .was { display: block; font-weight: 400; font-size: 12.5px; color: var(--ink-3); text-decoration: line-through; }
+.t-doi { display: block; margin-top: 3px; font: 400 11.5px var(--mono); color: var(--ink-3); overflow-wrap: anywhere; }
+.bad-v { color: var(--fail); font-weight: 600; }
+tr.dropped td { color: var(--ink-3); }
+tr.dropped .t-title { text-decoration: line-through; }
+.flags { display: flex; flex-wrap: wrap; gap: 5px; }
+.flags .chip { font-size: 10px; padding: 5px 7px; }
+.muted-row { color: var(--ink-3); font-size: 14px; padding-block: 18px; }
+
+footer { padding-block: 56px 72px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; color: var(--ink-3); font-size: 13px; }
+footer a { text-underline-offset: 3px; }
+
+@media (max-width: 1080px) {
+  .qgrid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 980px) {
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .span-2 { grid-column: 1 / -1; }
+  .pipe { padding-bottom: 0; padding-left: 34px; }
+  .stages { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+}
+@media (max-width: 680px) {
+  .grid { grid-template-columns: minmax(0, 1fr); }
+  .span-2, .span-3 { grid-column: auto; }
+  .top { padding-block: 16px; }
+  .brand span { display: none; }
+  .switch button { padding: 8px 10px; font-size: 14px; }
+  .hero-in { padding-block: 124px 72px; }
+  .tree { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .root-node { margin-right: 0; }
+  .root-node::after { display: none; }
+  .branches { padding-left: 18px; }
+  .branches::before { top: 0; }
+  .branches li::before { left: -18px; width: 18px; }
+  .qgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .qdetail { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 380px) {
+  .switch button { padding: 7px 8px; gap: 6px; font-size: 13px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+  .card.pre { transform: none; }
+}
+</style>
+</head>
+<body>
+
+<section class="hero" id="top">
+  <header class="top wrap">
+    <a class="brand" href="#top" aria-label="THTrueMi">
+      <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="1" y="1" width="10" height="10" rx="2" fill="currentColor"/><rect x="13" y="13" width="10" height="10" rx="2" fill="currentColor"/><rect x="13" y="1" width="10" height="10" rx="2" fill="currentColor" opacity=".3"/></svg>
+      <span>THTrueMi</span>
+    </a>
+    <div class="top-r">
+      <div class="switch" role="group" aria-label="Chọn trạng thái dữ liệu">
+        <button type="button" id="st-baseline" data-state="baseline" aria-pressed="true">Baseline</button>
+        <button type="button" id="st-corrupted" data-state="corrupted" aria-pressed="false">Corrupted</button>
+        <button type="button" id="st-repaired" data-state="repaired" aria-pressed="false">Repaired</button>
+      </div>
+      <a class="round" id="repoLink" href="#" target="_blank" rel="noopener" aria-label="Mở repository trên GitHub">
+        <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 12 12 4M5.5 4H12v6.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+  </header>
+  <canvas id="fx" aria-hidden="true"></canvas>
+  <div class="hero-in wrap">
+    <h1 id="headline" aria-label="Dữ liệu sạch là mặc định"><span class="line" aria-hidden="true">Dữ liệu sạch</span><span class="line" aria-hidden="true">là mặc định</span></h1>
+    <p class="lede">24 bài báo từ Crossref, 6 kiểu làm hỏng dữ liệu, 1 cổng kiểm định Great Expectations. Chuyển trạng thái để xem pipeline bắt được gì, bỏ sót gì và phục hồi ra sao.</p>
+    <p class="state-line" id="stateLine"><span class="state-tag" id="stateTag">Baseline</span><span id="stateNote"></span></p>
+  </div>
+</section>
+
+<main class="wrap">
+  <div class="live">
+    <span class="pulse" aria-hidden="true"></span>
+    <span class="eyebrow" style="color:var(--ink)">Live</span>
+    <span class="rule" aria-hidden="true"></span>
+    <span class="src"><span class="eyebrow" style="color:var(--ink)" id="srcLabel">Từ pipeline</span>
+      <span class="ico" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="1" y="1" width="10" height="10" rx="2" fill="currentColor"/><rect x="13" y="13" width="10" height="10" rx="2" fill="currentColor"/><rect x="13" y="1" width="10" height="10" rx="2" fill="currentColor" opacity=".4"/></svg></span>
+    </span>
+  </div>
+
+  <div class="grid">
+    <article class="card dark span-3" id="pipeCard">
+      <div class="card-h" id="pipeHead"></div>
+      <div class="pipe" id="pipe"><canvas id="pipeFx" aria-hidden="true"></canvas><ol class="stages" id="stages"></ol></div>
+      <p class="foot-note" id="pipeNote"></p>
+    </article>
+    <article class="card dark" id="gateCard" aria-live="polite"></article>
+    <article class="card grey" id="metricsCard"></article>
+    <article class="card plain ages" id="agesCard"></article>
+    <article class="card grey span-2" id="treeCard"></article>
+    <article class="card dark" id="lineageCard"></article>
+    <article class="card plain span-3" id="questionsCard"></article>
+    <article class="card plain span-3" id="papersCard"></article>
+  </div>
+</main>
+
+<footer class="wrap" id="foot"></footer>
+
+<script id="dashboard-data" type="application/json">{"meta":{"repo":"https://github.com/tamnd2004/K4-L3B-DAY10-THTrueMi-DataPipelineDataObservability","source":"Crossref REST API","query":"agentic retrieval augmented generation large language model","filter":"from-pub-date:2026-03-30,has-abstract:true","embedding_model":"sentence-transformers/all-MiniLM-L6-v2","top_k":4,"freshness_threshold_days":180,"min_rows":5,"max_rows":5000,"min_summary_chars":30,"seed":42,"corrupted_at":"2026-09-26T03:39:22.953849+00:00","raw_items":24},"states":{"baseline":{"metrics":{"retrieval_hit_rate":1.0,"mean_token_f1":1.0,"judge_accuracy":1.0,"mean_judge_score":5},"gate":{"success":true,"passed":6,"total":6,"checked_at":"2026-09-26T03:38:31.089671+00:00","expectations":[{"name":"expect_table_row_count_to_be_between","column":null,"success":true,"observed":24,"unexpected":null},{"name":"expect_column_values_to_not_be_null","column":"paper_id","success":true,"observed":null,"unexpected":0},{"name":"expect_column_values_to_be_unique","column":"paper_id","success":true,"observed":null,"unexpected":0},{"name":"expect_column_values_to_not_be_null","column":"title","success":true,"observed":null,"unexpected":0},{"name":"expect_column_values_to_not_be_null","column":"text_for_embedding","success":true,"observed":null,"unexpected":0},{"name":"expect_column_value_lengths_to_be_between","column":"summary","success":true,"observed":null,"unexpected":0}]},"freshness":{"latest_published":"2026-09-15","oldest_published":"2026-04-01","threshold_days":180,"max_stale_ratio":0.25,"stale_rows":0,"total_rows":24,"stale_ratio":0.0,"is_fresh":true},"dataset":{"rows":24,"unique_paper_ids":24,"fingerprint":"8b5b9cc5e8239eab"}},"corrupted":{"metrics":{"retrieval_hit_rate":0.9,"mean_token_f1":0.9,"judge_accuracy":0.9,"mean_judge_score":4.6},"gate":{"success":false,"passed":4,"total":6,"checked_at":"2026-09-26T03:39:23.071845+00:00","expectations":[{"name":"expect_table_row_count_to_be_between","column":null,"success":true,"observed":22,"unexpected":null},{"name":"expect_column_values_to_not_be_null","column":"paper_id","success":true,"observed":null,"unexpected":0},{"name":"expect_column_values_to_be_unique","column":"paper_id","success":false,"observed":null,"unexpected":6},{"name":"expect_column_values_to_not_be_null","column":"title","success":true,"observed":null,"unexpected":0},{"name":"expect_column_values_to_not_be_null","column":"text_for_embedding","success":true,"observed":null,"unexpected":0},{"name":"expect_column_value_lengths_to_be_between","column":"summary","success":false,"observed":null,"unexpected":3}]},"freshness":{"latest_published":"2026-08-26","oldest_published":"2025-05-06","threshold_days":180,"max_stale_ratio":0.25,"stale_rows":8,"total_rows":22,"stale_ratio":0.3636,"is_fresh":false},"dataset":{"rows":22,"unique_paper_ids":19,"fingerprint":"7bf7953b239d393a"}},"repaired":{"metrics":{"retrieval_hit_rate":1.0,"mean_token_f1":1.0,"judge_accuracy":1.0,"mean_judge_score":5},"gate":{"success":true,"passed":6,"total":6,"checked_at":"2026-09-26T03:39:47.187373+00:00","expectations":[{"name":"expect_table_row_count_to_be_between","column":null,"success":true,"observed":24,"unexpected":null},{"name":"expect_column_values_to_not_be_null","column":"paper_id","success":true,"observed":null,"unexpected":0},{"name":"expect_column_values_to_be_unique","column":"paper_id","success":true,"observed":null,"unexpected":0},{"name":"expect_column_values_to_not_be_null","column":"title","success":true,"observed":null,"unexpected":0},{"name":"expect_column_values_to_not_be_null","column":"text_for_embedding","success":true,"observed":null,"unexpected":0},{"name":"expect_column_value_lengths_to_be_between","column":"summary","success":true,"observed":null,"unexpected":0}]},"freshness":{"latest_published":"2026-09-15","oldest_published":"2026-04-01","threshold_days":180,"max_stale_ratio":0.25,"stale_rows":0,"total_rows":24,"stale_ratio":0.0,"is_fresh":true},"dataset":{"rows":24,"unique_paper_ids":24,"fingerprint":"8b5b9cc5e8239eab"}}},"scenarios":[{"id":"drop_latest_records","description":"Drop 20% newest papers","rows":5,"signal":["expect_table_row_count_to_be_between",null],"verdict":"missed","records":[{"paper_id":"10.21203/rs.3.rs-10489777/v1","title":"DOLPHIN: A Privacy-Preserving Digital Investigation Readiness Assessment Framework based on Offline Large Language Models and Retrieval-Augmented Generation","published":"2026-09-15"},{"paper_id":"10.70267/aitia.2026482489","title":"Retrieval-Augmented Generation for Large Language Model-Based Intelligent Assistants: A Review","published":"2026-09-13"},{"paper_id":"10.21203/rs.3.rs-10349437/v1","title":"Agentic Retrieval-Augmented Generation for Verifiable Regulatory Compliance in Urban Cyber-Physical Systems","published":"2026-09-12"},{"paper_id":"10.54254/2755-2721/2026.36624","title":"Advances in Reinforcement Learning for Retrieval-Augmented Generation in Large Language Model","published":"2026-09-08"},{"paper_id":"10.36887/2415-8453-2026-3-2","title":"Intelligent automation of economic processes based on retrieval-augmented generation and large language models","published":"2026-09-04"}]},{"id":"blank_summary","description":"Set summary to an empty string","rows":3,"signal":["expect_column_value_lengths_to_be_between","summary"],"verdict":"detected","records":[{"paper_id":"10.3390/buildings16132637","summary_chars_before":2207},{"paper_id":"10.52060/juptik.v4i1.4318","summary_chars_before":1095},{"paper_id":"10.20944/preprints202604.0339.v1","summary_chars_before":1687}]},{"id":"inject_noise","description":"Insert random junk tokens after ~25% of summary words","rows":3,"signal":null,"verdict":"silent","records":[{"paper_id":"10.21203/rs.3.rs-10178277/v1","noise_tokens":50,"summary_after":"Abstract Time-series foundation TgM#e8 models and retrieval-based augmentation have recently emerged 5zGIdM as relevant "},{"paper_id":"10.21079/11681/50309","noise_tokens":27,"summary_after":"The US tU^bUj Army TV#8cr Corps q724nb of Engineers @aakd5 (USACE) Civil Qu7reU Works (CW) research and development 4Foh"},{"paper_id":"10.21203/rs.3.rs-10012178/v1","noise_tokens":76,"summary_after":"Abstract Enterprise adoption of artificial intelligence (AI) systems, including Generative SJZ4ET AI (GenAI), Retrieval-"}]},{"id":"truncate_title","description":"Cut title to 7 characters","rows":3,"signal":null,"verdict":"silent","records":[{"paper_id":"10.3390/knowledge6030022","title_before":"Integrating Retrieval-Augmented Generation with Large Language Model for Robust and Explainable AI Text Detection","title_after":"Integra"},{"paper_id":"10.1007/s10278-026-02086-9","title_before":"JADE-Plus: A Multimodal Agentic Retrieval-Augmented Generation Large Language Framework for Diagnostic Support in Jawbone Lesions: Development and Technical Validation Study","title_after":"JADE-Pl"},{"paper_id":"10.63125/gseh0k17","title_before":"A Foundation Model Architecture for Supply Chain Risk Prediction: Integrating Large Language Models and Retrieval-Augmented Generation for Automated Disruption Alerting","title_after":"A Found"}]},{"id":"stale_date","description":"Shift published date back 365 days","rows":6,"signal":"freshness","verdict":"detected","records":[{"paper_id":"10.28932/jutisi.v12i2.13099","published_before":"2026-08-27","published_after":"2025-08-27","age_days_before":30,"age_days_after":395},{"paper_id":"10.21203/rs.3.rs-10423755/v1","published_before":"2026-08-26","published_after":"2025-08-26","age_days_before":31,"age_days_after":396},{"paper_id":"10.36948/ijfmr.2026.v08i04.85777","published_before":"2026-08-14","published_after":"2025-08-14","age_days_before":43,"age_days_after":408},{"paper_id":"10.2118/234689-pa","published_before":"2026-08-01","published_after":"2025-08-01","age_days_before":56,"age_days_after":421},{"paper_id":"10.63646/kpqm1958","published_before":"2026-06-30","published_after":"2025-06-30","age_days_before":88,"age_days_after":453},{"paper_id":"10.55041/isjem07213","published_before":"2026-05-06","published_after":"2025-05-06","age_days_before":143,"age_days_after":508}]},{"id":"duplicate_rows","description":"Append exact copies of rows","rows":3,"signal":["expect_column_values_to_be_unique","paper_id"],"verdict":"detected","records":[{"paper_id":"10.21203/rs.3.rs-10423755/v1","title":"Evidence Constrained Agentic Retrieval Augmented Generation for Substation Civil Engineering Preliminary Design Documents in a Single Project Study"},{"paper_id":"10.36948/ijfmr.2026.v08i04.85777","title":"A Framework for Adaptive Knowledge-Augmented Mizo Large Language Models Using Retrieval-Augmented Generation and Continual Learning"},{"paper_id":"10.47576/2949-1894.2026.7.7.023","title":"Снижение рисков применения LLM (Large Language Model) в сфере экономической безопасности предприятий молочной промышленности на основе подхода RAG (Retrieval-Augmented Generation)"}]}],"questions":[{"id":"eval_001","type":"summary","question":"What is the summary of the paper 'JADE-Plus: A Multimodal Agentic Retrieval-Augmented Generation Large Language Framework for Diagnostic Support in Jawbone Lesions: Development and Technical Validation Study'?","ground_truth":"Abstract Diagnosing jawbone lesions in oral and maxillofacial radiology remains challenging due to overlapping radiological features and the need for integrated clinical reasoning.","ground_truth_doc_ids":["10.1007/s10278-026-02086-9"],"corruptions":["truncate_title"],"hit":[true,true,true],"f1":[1.0,1.0,1.0],"judge":[5,5,5],"answers":["Abstract Diagnosing jawbone lesions in oral and maxillofacial radiology remains challenging due to overlapping radiological features and the need for integrated clinical reasoning.","Abstract Diagnosing jawbone lesions in oral and maxillofacial radiology remains challenging due to overlapping radiological features and the need for integrated clinical reasoning.","Abstract Diagnosing jawbone lesions in oral and maxillofacial radiology remains challenging due to overlapping radiological features and the need for integrated clinical reasoning."],"retrieved":[["10.1007/s10278-026-02086-9","10.1093/sleep/zsag091.0346","10.20944/preprints202608.1849.v1","10.36948/ijfmr.2026.v08i04.85777"],["10.1007/s10278-026-02086-9","10.1093/sleep/zsag091.0346","10.52060/juptik.v4i1.4318","10.20944/preprints202604.0339.v1"],["10.1007/s10278-026-02086-9","10.1093/sleep/zsag091.0346","10.20944/preprints202608.1849.v1","10.36948/ijfmr.2026.v08i04.85777"]]},{"id":"eval_002","type":"summary","question":"What is the summary of the paper '0346 Retrieval Augmented Generation Improves Large Language Model Performance in Sleep Medicine'?","ground_truth":"Abstract Introduction While Large Language Models (LLMs) offer generative capabilities, generic models often lack domain-specific grounding, leading to hallucinations in high-stakes contexts.","ground_truth_doc_ids":["10.1093/sleep/zsag091.0346"],"corruptions":[],"hit":[true,true,true],"f1":[1.0,1.0,1.0],"judge":[5,5,5],"answers":["Abstract Introduction While Large Language Models (LLMs) offer generative capabilities, generic models often lack domain-specific grounding, leading to hallucinations in high-stakes contexts.","Abstract Introduction While Large Language Models (LLMs) offer generative capabilities, generic models often lack domain-specific grounding, leading to hallucinations in high-stakes contexts.","Abstract Introduction While Large Language Models (LLMs) offer generative capabilities, generic models often lack domain-specific grounding, leading to hallucinations in high-stakes contexts."],"retrieved":[["10.1093/sleep/zsag091.0346","10.70267/aitia.2026482489","10.36948/ijfmr.2026.v08i04.85777","10.20944/preprints202604.0339.v1"],["10.1093/sleep/zsag091.0346","10.52060/juptik.v4i1.4318","10.20944/preprints202604.0339.v1","10.36948/ijfmr.2026.v08i04.85777"],["10.1093/sleep/zsag091.0346","10.70267/aitia.2026482489","10.36948/ijfmr.2026.v08i04.85777","10.20944/preprints202604.0339.v1"]]},{"id":"eval_003","type":"summary","question":"What is the summary of the paper 'Retrieval-Augmented Large Language Model Agents for Automated Scientific Literature Review Generation'?","ground_truth":"This study investigates a method that integrates retrieval-augmented mechanisms into large language model agents for scientific literature review generation.","ground_truth_doc_ids":["10.20944/preprints202604.0339.v1"],"corruptions":["blank_summary"],"hit":[true,true,true],"f1":[1.0,0.0,1.0],"judge":[5,1,5],"answers":["This study investigates a method that integrates retrieval-augmented mechanisms into large language model agents for scientific literature review generation.","","This study investigates a method that integrates retrieval-augmented mechanisms into large language model agents for scientific literature review generation."],"retrieved":[["10.20944/preprints202604.0339.v1","10.63646/kpqm1958","10.55041/isjem07213","10.36948/ijfmr.2026.v08i04.85777"],["10.20944/preprints202604.0339.v1","10.63646/kpqm1958","10.55041/isjem07213","10.52060/juptik.v4i1.4318"],["10.20944/preprints202604.0339.v1","10.63646/kpqm1958","10.55041/isjem07213","10.36948/ijfmr.2026.v08i04.85777"]]},{"id":"eval_004","type":"authors","question":"Who authored the paper 'An Agentic Retrieval-Augmented Vision-Language Recommendation System for Hyperdimensional Encoding Optimization'?","ground_truth":"Fardin Jalil Piran, Rajiv Malhotra, Farhad Imani","ground_truth_doc_ids":["10.20944/preprints202608.1849.v1"],"corruptions":[],"hit":[true,true,true],"f1":[1.0,1.0,1.0],"judge":[5,5,5],"answers":["Fardin Jalil Piran, Rajiv Malhotra, Farhad Imani","Fardin Jalil Piran, Rajiv Malhotra, Farhad Imani","Fardin Jalil Piran, Rajiv Malhotra, Farhad Imani"],"retrieved":[["10.20944/preprints202608.1849.v1","10.63646/kpqm1958","10.55041/isjem07213","10.36948/ijfmr.2026.v08i04.85777"],["10.20944/preprints202608.1849.v1","10.63646/kpqm1958","10.3390/buildings16132637","10.52060/juptik.v4i1.4318"],["10.20944/preprints202608.1849.v1","10.63646/kpqm1958","10.55041/isjem07213","10.36948/ijfmr.2026.v08i04.85777"]]},{"id":"eval_005","type":"authors","question":"Who authored the paper 'Microsoft Azure artificial intelligence / machine learning hackathon for development of retrieval-augmented generation large language model'?","ground_truth":"Janet L. Autrey, Lacey S. Duckworth, Ashly N. Horner, Thomas Sigler, Victoria D. Moore","ground_truth_doc_ids":["10.21079/11681/50309"],"corruptions":["inject_noise"],"hit":[true,true,true],"f1":[1.0,1.0,1.0],"judge":[5,5,5],"answers":["Janet L. Autrey, Lacey S. Duckworth, Ashly N. Horner, Thomas Sigler, Victoria D. Moore","Janet L. Autrey, Lacey S. Duckworth, Ashly N. Horner, Thomas Sigler, Victoria D. Moore","Janet L. Autrey, Lacey S. Duckworth, Ashly N. Horner, Thomas Sigler, Victoria D. Moore"],"retrieved":[["10.21079/11681/50309","10.63646/kpqm1958","10.20944/preprints202608.1849.v1","10.3390/knowledge6030022"],["10.21079/11681/50309","10.63646/kpqm1958","10.52060/juptik.v4i1.4318","10.20944/preprints202604.0339.v1"],["10.21079/11681/50309","10.63646/kpqm1958","10.20944/preprints202608.1849.v1","10.3390/knowledge6030022"]]},{"id":"eval_006","type":"authors","question":"Who authored the paper 'SafeRAG: A Large-Language-Model-Based Multistage Retrieval-Augmented Framework for Oil and Gas Safety Report Generation'?","ground_truth":"Qianwen Cao, Chiyu Zhang, Junxiong Ning, Gongru Li","ground_truth_doc_ids":["10.2118/234689-pa"],"corruptions":["stale_date"],"hit":[true,true,true],"f1":[1.0,1.0,1.0],"judge":[5,5,5],"answers":["Qianwen Cao, Chiyu Zhang, Junxiong Ning, Gongru Li","Qianwen Cao, Chiyu Zhang, Junxiong Ning, Gongru Li","Qianwen Cao, Chiyu Zhang, Junxiong Ning, Gongru Li"],"retrieved":[["10.2118/234689-pa","10.55041/isjem07213","10.63125/gseh0k17","10.20944/preprints202604.0339.v1"],["10.2118/234689-pa","10.20944/preprints202604.0339.v1","10.55041/isjem07213","10.21203/rs.3.rs-10423755/v1"],["10.2118/234689-pa","10.55041/isjem07213","10.63125/gseh0k17","10.20944/preprints202604.0339.v1"]]},{"id":"eval_007","type":"date","question":"When was the paper 'Retrieval-Augmented Generation (RAG), Generative AI, and Agentic AI Governance: An Integrated Enterprise Governance Prioritization Architecture' published?","ground_truth":"2026-06-15","ground_truth_doc_ids":["10.21203/rs.3.rs-10012178/v1"],"corruptions":["inject_noise"],"hit":[true,true,true],"f1":[1.0,1.0,1.0],"judge":[5,5,5],"answers":["2026-06-15","2026-06-15","2026-06-15"],"retrieved":[["10.21203/rs.3.rs-10012178/v1","10.63646/kpqm1958","10.21203/rs.3.rs-10423755/v1","10.21203/rs.3.rs-10349437/v1"],["10.21203/rs.3.rs-10012178/v1","10.63646/kpqm1958","10.21203/rs.3.rs-10423755/v1","10.21203/rs.3.rs-10423755/v1"],["10.21203/rs.3.rs-10012178/v1","10.63646/kpqm1958","10.21203/rs.3.rs-10423755/v1","10.21203/rs.3.rs-10349437/v1"]]},{"id":"eval_008","type":"date","question":"When was the paper 'Retrieval-Augmented Large-Language-Model-Based Time-Series Forecasting for Cross-Market Equity Analysis' published?","ground_truth":"2026-07-10","ground_truth_doc_ids":["10.21203/rs.3.rs-10178277/v1"],"corruptions":["inject_noise"],"hit":[true,true,true],"f1":[1.0,1.0,1.0],"judge":[5,5,5],"answers":["2026-07-10","2026-07-10","2026-07-10"],"retrieved":[["10.21203/rs.3.rs-10178277/v1","10.55041/isjem07213","10.1093/sleep/zsag091.0346","10.47576/2949-1894.2026.7.7.023"],["10.21203/rs.3.rs-10178277/v1","10.20944/preprints202604.0339.v1","10.55041/isjem07213","10.1093/sleep/zsag091.0346"],["10.21203/rs.3.rs-10178277/v1","10.55041/isjem07213","10.1093/sleep/zsag091.0346","10.47576/2949-1894.2026.7.7.023"]]},{"id":"eval_009","type":"categories","question":"What categories does the paper 'Agentic Retrieval-Augmented Generation for Verifiable Regulatory Compliance in Urban Cyber-Physical Systems' belong to?","ground_truth":"posted-content","ground_truth_doc_ids":["10.21203/rs.3.rs-10349437/v1"],"corruptions":["drop_latest_records"],"hit":[true,false,true],"f1":[1.0,1.0,1.0],"judge":[5,5,5],"answers":["posted-content","posted-content","posted-content"],"retrieved":[["10.21203/rs.3.rs-10349437/v1","10.3390/buildings16132637","10.21203/rs.3.rs-10423755/v1","10.63646/kpqm1958"],["10.21203/rs.3.rs-10423755/v1","10.21203/rs.3.rs-10423755/v1","10.3390/buildings16132637","10.21203/rs.3.rs-10012178/v1"],["10.21203/rs.3.rs-10349437/v1","10.3390/buildings16132637","10.21203/rs.3.rs-10423755/v1","10.63646/kpqm1958"]]},{"id":"eval_010","type":"categories","question":"What categories does the paper 'Evidence Constrained Agentic Retrieval Augmented Generation for Substation Civil Engineering Preliminary Design Documents in a Single Project Study' belong to?","ground_truth":"posted-content","ground_truth_doc_ids":["10.21203/rs.3.rs-10423755/v1"],"corruptions":["duplicate_rows","stale_date"],"hit":[true,true,true],"f1":[1.0,1.0,1.0],"judge":[5,5,5],"answers":["posted-content","posted-content","posted-content"],"retrieved":[["10.21203/rs.3.rs-10423755/v1","10.3390/buildings16132637","10.21203/rs.3.rs-10349437/v1","10.63646/kpqm1958"],["10.21203/rs.3.rs-10423755/v1","10.3390/buildings16132637","10.63646/kpqm1958"],["10.21203/rs.3.rs-10423755/v1","10.3390/buildings16132637","10.21203/rs.3.rs-10349437/v1","10.63646/kpqm1958"]]}],"papers":[{"id":"10.21203/rs.3.rs-10489777/v1","title":"DOLPHIN: A Privacy-Preserving Digital Investigation Readiness Assessment Framework based on Offline Large Language Models and Retrieval-Augmented Generation","authors":"Divya K","category":"posted-content","published":"2026-09-15","age_days":11,"summary_chars":2135,"url":"https://doi.org/10.21203/rs.3.rs-10489777/v1","flags":["drop_latest_records"],"corrupted":null},{"id":"10.70267/aitia.2026482489","title":"Retrieval-Augmented Generation for Large Language Model-Based Intelligent Assistants: A Review","authors":"Zilang Shao","category":"journal-article","published":"2026-09-13","age_days":13,"summary_chars":1329,"url":"https://doi.org/10.70267/aitia.2026482489","flags":["drop_latest_records"],"corrupted":null},{"id":"10.21203/rs.3.rs-10349437/v1","title":"Agentic Retrieval-Augmented Generation for Verifiable Regulatory Compliance in Urban Cyber-Physical Systems","authors":"Sathiska Priyad, Gayathri Karthick","category":"posted-content","published":"2026-09-12","age_days":14,"summary_chars":1715,"url":"https://doi.org/10.21203/rs.3.rs-10349437/v1","flags":["drop_latest_records"],"corrupted":null},{"id":"10.54254/2755-2721/2026.36624","title":"Advances in Reinforcement Learning for Retrieval-Augmented Generation in Large Language Model","authors":"Zunlong Hong","category":"journal-article","published":"2026-09-08","age_days":18,"summary_chars":1106,"url":"https://doi.org/10.54254/2755-2721/2026.36624","flags":["drop_latest_records"],"corrupted":null},{"id":"10.36887/2415-8453-2026-3-2","title":"Intelligent automation of economic processes based on retrieval-augmented generation and large language models","authors":"Serhii Arefiev, Serhii Hildi","category":"journal-article","published":"2026-09-04","age_days":22,"summary_chars":2095,"url":"https://doi.org/10.36887/2415-8453-2026-3-2","flags":["drop_latest_records"],"corrupted":null},{"id":"10.28932/jutisi.v12i2.13099","title":"Transformasi Layanan Informasi Berbasis Chatbot Retrieval-Augmented Generation dan Large Language Model","authors":"Muhamad Komarudin, Chelly Sabrina, Yessy Mulyani, Puput Budi Wintoro","category":"journal-article","published":"2026-08-27","age_days":30,"summary_chars":1809,"url":"https://doi.org/10.28932/jutisi.v12i2.13099","flags":["stale_date"],"corrupted":{"copies":1,"title":"Transformasi Layanan Informasi Berbasis Chatbot Retrieval-Augmented Generation dan Large Language Model","published":"2025-08-27","age_days":395,"summary_chars":1809}},{"id":"10.20944/preprints202608.1849.v1","title":"An Agentic Retrieval-Augmented Vision-Language Recommendation System for Hyperdimensional Encoding Optimization","authors":"Fardin Jalil Piran, Rajiv Malhotra, Farhad Imani","category":"posted-content","published":"2026-08-26","age_days":31,"summary_chars":1856,"url":"https://doi.org/10.20944/preprints202608.1849.v1","flags":[],"corrupted":{"copies":1,"title":"An Agentic Retrieval-Augmented Vision-Language Recommendation System for Hyperdimensional Encoding Optimization","published":"2026-08-26","age_days":31,"summary_chars":1856}},{"id":"10.21203/rs.3.rs-10423755/v1","title":"Evidence Constrained Agentic Retrieval Augmented Generation for Substation Civil Engineering Preliminary Design Documents in a Single Project Study","authors":"Yizhang Huang, Xinhui Zhang","category":"posted-content","published":"2026-08-26","age_days":31,"summary_chars":1958,"url":"https://doi.org/10.21203/rs.3.rs-10423755/v1","flags":["stale_date","duplicate_rows"],"corrupted":{"copies":2,"title":"Evidence Constrained Agentic Retrieval Augmented Generation for Substation Civil Engineering Preliminary Design Documents in a Single Project Study","published":"2025-08-26","age_days":396,"summary_chars":1958}},{"id":"10.3390/knowledge6030022","title":"Integrating Retrieval-Augmented Generation with Large Language Model for Robust and Explainable AI Text Detection","authors":"Ibtasam Ur Rehman, Muhammad Islam, Muhammad Yousaf Rehman, Basharat Hussain","category":"journal-article","published":"2026-08-25","age_days":32,"summary_chars":1672,"url":"https://doi.org/10.3390/knowledge6030022","flags":["truncate_title"],"corrupted":{"copies":1,"title":"Integra","published":"2026-08-25","age_days":32,"summary_chars":1672}},{"id":"10.36948/ijfmr.2026.v08i04.85777","title":"A Framework for Adaptive Knowledge-Augmented Mizo Large Language Models Using Retrieval-Augmented Generation and Continual Learning","authors":"Vanlalropuia Ralte, Abhisake Sinha -","category":"journal-article","published":"2026-08-14","age_days":43,"summary_chars":1128,"url":"https://doi.org/10.36948/ijfmr.2026.v08i04.85777","flags":["stale_date","duplicate_rows"],"corrupted":{"copies":2,"title":"A Framework for Adaptive Knowledge-Augmented Mizo Large Language Models Using Retrieval-Augmented Generation and Continual Learning","published":"2025-08-14","age_days":408,"summary_chars":1128}},{"id":"10.2118/234689-pa","title":"SafeRAG: A Large-Language-Model-Based Multistage Retrieval-Augmented Framework for Oil and Gas Safety Report Generation","authors":"Qianwen Cao, Chiyu Zhang, Junxiong Ning, Gongru Li","category":"journal-article","published":"2026-08-01","age_days":56,"summary_chars":1404,"url":"https://doi.org/10.2118/234689-pa","flags":["stale_date"],"corrupted":{"copies":1,"title":"SafeRAG: A Large-Language-Model-Based Multistage Retrieval-Augmented Framework for Oil and Gas Safety Report Generation","published":"2025-08-01","age_days":421,"summary_chars":1404}},{"id":"10.1007/s10278-026-02086-9","title":"JADE-Plus: A Multimodal Agentic Retrieval-Augmented Generation Large Language Framework for Diagnostic Support in Jawbone Lesions: Development and Technical Validation Study","authors":"Soroush Baseri Saadi, Jonas Ver Berne, Rocharles Cavalcante Fontenele, Peter Claes, Reinhilde Jacobs","category":"journal-article","published":"2026-07-13","age_days":75,"summary_chars":1869,"url":"https://doi.org/10.1007/s10278-026-02086-9","flags":["truncate_title"],"corrupted":{"copies":1,"title":"JADE-Pl","published":"2026-07-13","age_days":75,"summary_chars":1869}},{"id":"10.21203/rs.3.rs-10178277/v1","title":"Retrieval-Augmented Large-Language-Model-Based Time-Series Forecasting for Cross-Market Equity Analysis","authors":"Novanto Yudistira, Yanuar Putra Kharisma Adhiyasa","category":"posted-content","published":"2026-07-10","age_days":78,"summary_chars":1945,"url":"https://doi.org/10.21203/rs.3.rs-10178277/v1","flags":["inject_noise"],"corrupted":{"copies":1,"title":"Retrieval-Augmented Large-Language-Model-Based Time-Series Forecasting for Cross-Market Equity Analysis","published":"2026-07-10","age_days":78,"summary_chars":2295}},{"id":"10.2196/preprints.106157","title":"Does retrieval-augmented generation impact medical students’ perceptions of large language models? (Preprint)","authors":"Rohin Athavale, Alexander Cresswell, Alice Huffman","category":"posted-content","published":"2026-07-03","age_days":85,"summary_chars":1765,"url":"https://doi.org/10.2196/preprints.106157","flags":[],"corrupted":{"copies":1,"title":"Does retrieval-augmented generation impact medical students’ perceptions of large language models? (Preprint)","published":"2026-07-03","age_days":85,"summary_chars":1765}},{"id":"10.3390/buildings16132637","title":"An Agentic AI System for Roof Design Compliance Using Computer Vision, Retrieval-Augmented Generation and Large Language Models","authors":"Nawari O. Nawari, Oluwatoyin O. Lawal","category":"journal-article","published":"2026-07-02","age_days":86,"summary_chars":2207,"url":"https://doi.org/10.3390/buildings16132637","flags":["blank_summary"],"corrupted":{"copies":1,"title":"An Agentic AI System for Roof Design Compliance Using Computer Vision, Retrieval-Augmented Generation and Large Language Models","published":"2026-07-02","age_days":86,"summary_chars":0}},{"id":"10.21079/11681/50309","title":"Microsoft Azure artificial intelligence / machine learning hackathon for development of retrieval-augmented generation large language model","authors":"Janet L. Autrey, Lacey S. Duckworth, Ashly N. Horner, Thomas Sigler, Victoria D. Moore","category":"report","published":"2026-07-01","age_days":87,"summary_chars":826,"url":"https://doi.org/10.21079/11681/50309","flags":["inject_noise"],"corrupted":{"copies":1,"title":"Microsoft Azure artificial intelligence / machine learning hackathon for development of retrieval-augmented generation large language model","published":"2026-07-01","age_days":87,"summary_chars":1015}},{"id":"10.63646/kpqm1958","title":"The Age of Autonomous Agents: A Bibliometric Review of Agentic AI Architectures, Applications, and Emerging Challenges","authors":"Ben J. Weber, Clara M. Hofmann, Amara N. Okoye","category":"journal-article","published":"2026-06-30","age_days":88,"summary_chars":1635,"url":"https://doi.org/10.63646/kpqm1958","flags":["stale_date"],"corrupted":{"copies":1,"title":"The Age of Autonomous Agents: A Bibliometric Review of Agentic AI Architectures, Applications, and Emerging Challenges","published":"2025-06-30","age_days":453,"summary_chars":1635}},{"id":"10.21203/rs.3.rs-10012178/v1","title":"Retrieval-Augmented Generation (RAG), Generative AI, and Agentic AI Governance: An Integrated Enterprise Governance Prioritization Architecture","authors":"Audrey Rah, Sven Hahues","category":"posted-content","published":"2026-06-15","age_days":103,"summary_chars":2610,"url":"https://doi.org/10.21203/rs.3.rs-10012178/v1","flags":["inject_noise"],"corrupted":{"copies":1,"title":"Retrieval-Augmented Generation (RAG), Generative AI, and Agentic AI Governance: An Integrated Enterprise Governance Prioritization Architecture","published":"2026-06-15","age_days":103,"summary_chars":3142}},{"id":"10.47576/2949-1894.2026.7.7.023","title":"Снижение рисков применения LLM (Large Language Model) в сфере экономической безопасности предприятий молочной промышленности на основе подхода RAG (Retrieval-Augmented Generation)","authors":"И.В. Ермаков, В.В. Филатов","category":"journal-article","published":"2026-06-15","age_days":103,"summary_chars":1597,"url":"https://doi.org/10.47576/2949-1894.2026.7.7.023","flags":["duplicate_rows"],"corrupted":{"copies":2,"title":"Снижение рисков применения LLM (Large Language Model) в сфере экономической безопасности предприятий молочной промышленности на основе подхода RAG (Retrieval-Augmented Generation)","published":"2026-06-15","age_days":103,"summary_chars":1597}},{"id":"10.52060/juptik.v4i1.4318","title":"Chatbot Hybrid Fatwa MUI Menggunakan Retrieval Augmented Generation dan Large Language Model","authors":"Surya Hidayatullah Firdaus, Nazruddin Safaat H, Yelfi Vitriani, Novriyanto","category":"journal-article","published":"2026-06-01","age_days":117,"summary_chars":1095,"url":"https://doi.org/10.52060/juptik.v4i1.4318","flags":["blank_summary"],"corrupted":{"copies":1,"title":"Chatbot Hybrid Fatwa MUI Menggunakan Retrieval Augmented Generation dan Large Language Model","published":"2026-06-01","age_days":117,"summary_chars":0}},{"id":"10.55041/isjem07213","title":"Speculative Retrieval-Augmented Generation for Cost-Efficient Large Language Model Inference","authors":"Dr. Sumalatha P, Manoj Kumar","category":"journal-article","published":"2026-05-06","age_days":143,"summary_chars":1571,"url":"https://doi.org/10.55041/isjem07213","flags":["stale_date"],"corrupted":{"copies":1,"title":"Speculative Retrieval-Augmented Generation for Cost-Efficient Large Language Model Inference","published":"2025-05-06","age_days":508,"summary_chars":1571}},{"id":"10.1093/sleep/zsag091.0346","title":"0346 Retrieval Augmented Generation Improves Large Language Model Performance in Sleep Medicine","authors":"Joseph Cheung, Pengze Li, Anshum Patel, SaiKrishna Vallamchetla, Het Contractor, Hayden Heninger, Cui Tao","category":"journal-article","published":"2026-05-01","age_days":148,"summary_chars":2491,"url":"https://doi.org/10.1093/sleep/zsag091.0346","flags":[],"corrupted":{"copies":1,"title":"0346 Retrieval Augmented Generation Improves Large Language Model Performance in Sleep Medicine","published":"2026-05-01","age_days":148,"summary_chars":2491}},{"id":"10.20944/preprints202604.0339.v1","title":"Retrieval-Augmented Large Language Model Agents for Automated Scientific Literature Review Generation","authors":"Ruotong Wang, Nyutian Long, Shunqi Liu, Yuxi Wang, Zhen Qi, Huajun Zhang","category":"posted-content","published":"2026-04-06","age_days":173,"summary_chars":1687,"url":"https://doi.org/10.20944/preprints202604.0339.v1","flags":["blank_summary"],"corrupted":{"copies":1,"title":"Retrieval-Augmented Large Language Model Agents for Automated Scientific Literature Review Generation","published":"2026-04-06","age_days":173,"summary_chars":0}},{"id":"10.63125/gseh0k17","title":"A Foundation Model Architecture for Supply Chain Risk Prediction: Integrating Large Language Models and Retrieval-Augmented Generation for Automated Disruption Alerting","authors":"Nadia Islam Tanha","category":"journal-article","published":"2026-04-01","age_days":178,"summary_chars":3814,"url":"https://doi.org/10.63125/gseh0k17","flags":["truncate_title"],"corrupted":{"copies":1,"title":"A Found","published":"2026-04-01","age_days":178,"summary_chars":3814}}]}</script>
+<script>
+(() => {
+  "use strict";
+  const D = JSON.parse(document.getElementById("dashboard-data").textContent);
+  const STATES = ["baseline", "corrupted", "repaired"];
+  const STATE_LABEL = { baseline: "Baseline", corrupted: "Corrupted", repaired: "Repaired" };
+  const STATE_NOTE = {
+    baseline: "Dữ liệu gốc sau bước làm sạch, trước khi bị làm hỏng.",
+    corrupted: "Sau 6 kịch bản làm hỏng, index không qua cổng kiểm định để đo tác hại.",
+    repaired: "Dựng lại từ raw snapshot, kiểm định lại rồi mới index.",
+  };
+  const SC = {
+    drop_latest_records: { label: "Bỏ 20% bài mới nhất", short: "Bỏ bài mới" },
+    blank_summary: { label: "Xóa trắng summary", short: "Summary rỗng" },
+    inject_noise: { label: "Chèn ký tự rác", short: "Ký tự rác" },
+    truncate_title: { label: "Cắt title còn 7 ký tự", short: "Title cụt" },
+    stale_date: { label: "Lùi ngày xuất bản 365 ngày", short: "Ngày cũ" },
+    duplicate_rows: { label: "Nhân đôi dòng", short: "Trùng lặp" },
+  };
+  const VERDICT = { detected: ["pass", "Bắt được"], missed: ["fail", "Bỏ sót"], silent: ["warn", "Âm thầm"] };
+  const QTYPE = { summary: "Tóm tắt", authors: "Tác giả", date: "Ngày", categories: "Phân loại" };
+
+  const fmt = (d) => new Intl.NumberFormat("vi-VN", { minimumFractionDigits: d, maximumFractionDigits: d });
+  const pct = (v, d = 0) => fmt(d).format(v * 100) + "%";
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  const $ = (id) => document.getElementById(id);
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)");
+  const rnd = Math.random;
+
+  let state = "baseline";
+  let paperFilter = "all";
+  let selectedQ = (D.questions || []).find((q) => q.hit[1] !== q.hit[0] || q.judge[1] !== q.judge[0])?.id || D.questions?.[0]?.id;
+  try { const h = location.hash.slice(1); if (STATES.includes(h)) state = h; } catch (e) {}
+
+  /* ---------- Number tween ---------- */
+  const prevNum = {};
+  function countUp(el, key, to, format, dur = 900) {
+    const from = prevNum[key] ?? 0;
+    prevNum[key] = to;
+    if (reduce.matches || from === to) { el.textContent = format(to); return; }
+    const t0 = performance.now();
+    const tick = (now) => {
+      const k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+      el.textContent = format(from + (to - from) * e);
+      if (k < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }
+
+  /* ---------- Labels from real gate config ---------- */
+  function expLabel(e) {
+    const m = D.meta;
+    switch (e.name) {
+      case "expect_table_row_count_to_be_between": return `Số dòng trong khoảng ${m.min_rows}–${fmt(0).format(m.max_rows)}`;
+      case "expect_column_values_to_not_be_null": return `<code>${esc(e.column)}</code> không null`;
+      case "expect_column_values_to_be_unique": return `<code>${esc(e.column)}</code> không trùng`;
+      case "expect_column_value_lengths_to_be_between": return `<code>${esc(e.column)}</code> ≥ ${m.min_summary_chars} ký tự`;
+      default: return esc(e.name);
+    }
+  }
+  function expDetail(e) {
+    if (e.unexpected == null) return `${e.observed} dòng`;
+    if (!e.unexpected) return "0 lỗi";
+    return e.name.includes("unique") ? `${e.unexpected} dòng trùng` : `${e.unexpected} dòng lỗi`;
+  }
+  function signalText(s) {
+    const c = D.states.corrupted;
+    if (s.signal === null) return "Không có check nào theo dõi";
+    if (s.signal === "freshness") {
+      const f = c.freshness;
+      return `Freshness: ${pct(f.stale_ratio, 1)} stale, vượt ngưỡng ${pct(f.max_stale_ratio)}`;
+    }
+    const e = c.gate.expectations.find((x) => x.name === s.signal[0] && x.column === s.signal[1]);
+    if (!e) return "Không tìm thấy check";
+    return `${expLabel(e)}: ${e.success ? "vẫn pass (" + expDetail(e) + ")" : expDetail(e)}`;
+  }
+
+  /* ---------- Pipeline ---------- */
+  function stagesFor(s) {
+    const S = D.states[s], B = D.states.baseline, m = D.meta, g = S.gate;
+    const cor = s === "corrupted", rep = s === "repaired";
+    const worse = S.metrics.judge_accuracy < B.metrics.judge_accuracy;
+    return [
+      { n: "Crossref API", code: "ingestion/crossref.py", v: `${m.raw_items} items · retry + fallback`, chip: rep ? ["soft", "Không gọi lại"] : ["pass", "Live"], cls: rep ? "dim" : "" },
+      { n: "Raw snapshot", code: "data/raw/*.json", v: `${m.raw_items} bản ghi gốc`, chip: rep ? ["pass", "Nguồn repair"] : ["soft", "Lineage"], cls: rep ? "good" : "" },
+      { n: "Cleaning", code: "ingestion/cleaning.py", v: `${S.dataset.rows} dòng · ${S.dataset.unique_paper_ids} paper_id`, chip: cor ? ["fail", "6 lỗi tiêm vào"] : rep ? ["pass", "Dựng lại"] : ["soft", "Chuẩn hóa"], cls: cor ? "bad" : rep ? "good" : "" },
+      { n: "Quality gate", code: "observability/quality.py", v: `${g.passed}/${g.total} checks · ${S.freshness.is_fresh ? "fresh" : "stale"}`, chip: g.success ? ["pass", "Pass"] : ["fail", "Fail · bị bỏ qua"], cls: g.success ? "" : "bad" },
+      { n: "ChromaDB", code: "retrieval/index.py", v: `${S.dataset.rows} văn bản · top-k ${m.top_k}`, chip: cor ? ["warn", "Index dữ liệu hỏng"] : ["soft", "MiniLM-L6"], cls: cor ? "warn" : "" },
+      { n: "Agent", code: "retrieval/qa.py", v: `Trả lời ${D.questions.length} câu hỏi`, chip: ["soft", "LLM"], cls: "" },
+      { n: "Evaluation", code: "evaluation/metrics.py", v: `Hit ${pct(S.metrics.retrieval_hit_rate)} · judge ${fmt(1).format(S.metrics.mean_judge_score)}/5`, chip: worse ? ["fail", "Giảm"] : ["pass", "Đạt"], cls: worse ? "bad" : "" },
+    ];
+  }
+  const PIPE_TEXT = {
+    baseline: ["Từ Crossref đến câu trả lời của agent", "Mỗi ô vuông là một bản ghi chạy qua pipeline. Qua quality gate, bản ghi đổi sang màu xanh: đã được kiểm định."],
+    corrupted: ["Dữ liệu hỏng đi thẳng vào index", "Sau bước cleaning, 6 kịch bản làm hỏng được tiêm vào: có bản ghi rơi mất, có bản ghi bị nhân đôi. Gate báo FAIL nhưng bị bỏ qua có chủ đích để đo tác hại lên agent."],
+    repaired: ["Dựng lại từ raw, qua gate rồi mới index", "Không gọi lại API: pipeline đọc lại raw snapshot, làm sạch, qua gate 6/6 rồi mới index. Bản ghi màu xanh lá là dữ liệu được phục hồi."],
+  };
+  function renderPipe() {
+    const [h, note] = PIPE_TEXT[state];
+    $("pipeHead").innerHTML = `<span class="eyebrow">Pipeline · 7 bước · ${STATE_LABEL[state]}</span><h2>${h}</h2>`;
+    $("pipeNote").textContent = note;
+    $("stages").innerHTML = stagesFor(state).map((s, i) => `
+      <li class="stage ${s.cls}" style="--i:${i}"><span class="s-n">${String(i + 1).padStart(2, "0")}</span><b>${s.n}</b><code>${s.code}</code>
+        <span class="s-v">${esc(s.v)}</span><span class="chip ${s.chip[0]}">${s.chip[1]}</span></li>`).join("");
+    pipeFx.geo();
+  }
+
+  const pipeFx = (() => {
+    const box = $("pipe"), cv = $("pipeFx"), c = cv.getContext("2d");
+    const COL = { white: "#F4F4F6", blue: "#6F8BFF", mag: "#F25BD6", green: "#3FD68A", red: "255,107,114", ring: "111,139,255" };
+    let w = 0, h = 0, dpr = 1, horiz = true, lane = null, len = 0, nodes = [], pulses = [], packets = [];
+    let raf = 0, last = 0, acc = 0, visible = true;
+
+    let dirty = false;
+    function geo() {
+      dirty = false;
+      w = box.clientWidth; h = box.clientHeight; dpr = Math.min(window.devicePixelRatio || 1, 2);
+      cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr);
+      // offset* ignores the stages' entrance transform, so the lane lines up with their resting position.
+      const ol = $("stages");
+      const rs = [...box.querySelectorAll(".stage")].map((li) => {
+        const left = ol.offsetLeft + li.offsetLeft, top = ol.offsetTop + li.offsetTop;
+        return { left, top, width: li.offsetWidth, height: li.offsetHeight, bottom: top + li.offsetHeight };
+      });
+      if (!rs.length) return;
+      horiz = rs.length > 1 && Math.abs(rs[0].top - rs[rs.length - 1].top) < 8;
+      if (horiz) {
+        const y = Math.max(...rs.map((q) => q.bottom)) + 26;
+        nodes = rs.map((q) => ({ x: q.left + q.width / 2, y, tx: q.left + q.width / 2, ty: q.bottom }));
+        lane = { x0: nodes[0].x, y }; len = nodes[nodes.length - 1].x - nodes[0].x;
+        nodes.forEach((n) => (n.s = n.x - lane.x0));
+      } else {
+        const x = 12;
+        nodes = rs.map((q) => ({ x, y: q.top + q.height / 2, tx: q.left, ty: q.top + q.height / 2 }));
+        lane = { x, y0: nodes[0].y }; len = nodes[nodes.length - 1].y - nodes[0].y;
+        nodes.forEach((n) => (n.s = n.y - lane.y0));
+      }
+      if (pulses.length !== nodes.length) pulses = nodes.map(() => ({ v: 0, red: false }));
+      packets.forEach((p) => { p.s = Math.min(p.s, len); p.idx = Math.max(0, nodes.findLastIndex((n) => n.s <= p.s)); });
+      if (!raf) draw(performance.now());
+    }
+    const pos = (s) => (horiz ? [lane.x0 + s, lane.y] : [lane.x, lane.y0 + s]);
+
+    function spawn() {
+      const start = state === "repaired" ? 1 : 0;
+      packets.push({ s: nodes[start].s, idx: start, v: 70 + rnd() * 55, size: 5 + rnd() * 3, st: state,
+        drop: state === "corrupted" && rnd() < 0.22, dup: state === "corrupted" && rnd() < 0.14, jit: rnd() * 6.28, a: 1 });
+    }
+    function colorOf(p) {
+      if (p.st === "corrupted") return p.idx >= 2 ? COL.mag : COL.white;
+      if (p.st === "repaired") return p.idx >= 3 ? COL.blue : COL.green;
+      return p.idx >= 3 ? COL.blue : COL.white;
+    }
+    function step(dt) {
+      if (!nodes.length) return;
+      acc += dt;
+      while (acc > 0.26) { acc -= 0.26; spawn(); }
+      const born = [];
+      for (const p of packets) {
+        p.s += p.v * dt;
+        while (p.idx + 1 < nodes.length && p.s >= nodes[p.idx + 1].s) {
+          p.idx++;
+          pulses[p.idx].v = 1;
+          pulses[p.idx].red = p.st === "corrupted" && p.idx >= 2 && p.idx <= 3;
+          if (p.st === "corrupted" && p.idx === 2) {
+            if (p.drop) p.dying = true;
+            if (p.dup) born.push({ ...p, s: p.s - 12, dup: false, drop: false, jit: rnd() * 6.28 });
+          }
+        }
+        if (p.dying) p.a -= dt * 2.2;
+        if (p.s >= len) p.a -= dt * 5;
+      }
+      packets = packets.concat(born).filter((p) => p.a > 0);
+      pulses.forEach((q) => (q.v = Math.max(0, q.v - dt * 2.4)));
+    }
+    function draw(now) {
+      c.setTransform(dpr, 0, 0, dpr, 0, 0);
+      c.clearRect(0, 0, w, h);
+      if (!nodes.length) return;
+      c.strokeStyle = "rgba(255,255,255,.22)"; c.lineWidth = 1;
+      c.beginPath();
+      const [ax, ay] = pos(0), [bx, by] = pos(len);
+      c.moveTo(ax, ay); c.lineTo(bx, by);
+      nodes.forEach((n) => { c.moveTo(n.tx, n.ty); c.lineTo(n.x, n.y); });
+      c.stroke();
+      nodes.forEach((n, i) => {
+        const q = pulses[i], col = q.red ? COL.red : COL.ring;
+        c.fillStyle = `rgba(${col},${0.3 + q.v * 0.7})`;
+        c.beginPath(); c.arc(n.x, n.y, 3 + q.v * 3, 0, Math.PI * 2); c.fill();
+        if (q.v > 0.01) {
+          c.strokeStyle = `rgba(${col},${q.v * 0.6})`;
+          c.beginPath(); c.arc(n.x, n.y, 6 + (1 - q.v) * 14, 0, Math.PI * 2); c.stroke();
+        }
+      });
+      for (const p of packets) {
+        let [x, y] = pos(Math.min(p.s, len));
+        if (p.st === "corrupted" && p.idx >= 2) {
+          const j = Math.sin(now * 0.02 + p.jit) * 3.5;
+          if (horiz) y += j; else x += j;
+        }
+        const col = colorOf(p);
+        c.globalAlpha = Math.max(0, p.a);
+        c.shadowColor = col; c.shadowBlur = 10;
+        c.fillStyle = col;
+        c.fillRect(x - p.size / 2, y - p.size / 2, p.size, p.size);
+      }
+      c.globalAlpha = 1; c.shadowBlur = 0;
+    }
+    function loop(now) {
+      if (dirty || box.clientWidth !== w || box.clientHeight !== h) geo();
+      const dt = Math.min(0.05, (now - last) / 1000);
+      last = now;
+      step(dt); draw(now);
+      raf = requestAnimationFrame(loop);
+    }
+    function start() {
+      if (raf || !visible) return;
+      if (reduce.matches) { draw(performance.now()); return; }
+      last = performance.now(); raf = requestAnimationFrame(loop);
+    }
+    function stop() { cancelAnimationFrame(raf); raf = 0; }
+    function prefill() { for (let k = 0; k < 160; k++) step(0.05); }
+
+    new ResizeObserver(() => { if (raf) dirty = true; else geo(); }).observe(box);
+    new IntersectionObserver(([e]) => { visible = e.isIntersecting; visible ? start() : stop(); }).observe(box);
+    return { geo, start, prefill, draw };
+  })();
+
+  /* ---------- Cards ---------- */
+  function renderGate() {
+    const S = D.states[state], g = S.gate, f = S.freshness;
+    $("gateCard").innerHTML = `
+      <div class="card-h"><span class="eyebrow">Quality gate · Great Expectations</span>
+        <h2>${g.success ? "Dữ liệu đủ điều kiện để index" : "Cổng kiểm định chặn dữ liệu này"}</h2></div>
+      <div class="score"><span class="big"><span id="gateNum">0</span><span class="of">/${g.total}</span></span>
+        <span class="chip ${g.success ? "pass" : "fail"}">${g.success ? "Pass" : "Fail"}</span></div>
+      <ul class="checks">${g.expectations.map((e, i) => `
+        <li class="${e.success ? "" : "bad"}" style="--i:${i}"><span class="dot ${e.success ? "" : "bad"}" aria-hidden="true"></span>
+          <span>${expLabel(e)}</span><span class="det">${expDetail(e)}</span></li>`).join("")}</ul>
+      <div class="fresh"><span>Freshness · <b>${f.stale_rows}/${f.total_rows}</b> bài quá ${f.threshold_days} ngày (${pct(f.stale_ratio, 1)}, tối đa ${pct(f.max_stale_ratio)})</span>
+        <span class="chip ${f.is_fresh ? "pass" : "fail"}">${f.is_fresh ? "Fresh" : "Stale"}</span></div>`;
+    countUp($("gateNum"), "gate", g.passed, (v) => String(Math.round(v)), 700);
+  }
+
+  const MET = [
+    ["retrieval_hit_rate", "Retrieval hit rate", (v) => pct(v), 1],
+    ["mean_token_f1", "Mean token F1", (v) => fmt(2).format(v), 1],
+    ["judge_accuracy", "Judge accuracy", (v) => pct(v), 1],
+    ["mean_judge_score", "Điểm judge trung bình", (v) => fmt(1).format(v) + "/5", 5],
+  ];
+  function renderMetrics() {
+    const n = D.questions.length;
+    $("metricsCard").innerHTML = `
+      <div class="card-h"><span class="eyebrow">Chất lượng RAG · ${n} câu hỏi</span>
+        <h2>Agent trả lời đúng tới đâu</h2></div>
+      <div class="metrics">${MET.map(([k, label, f, max]) => {
+        const vals = STATES.map((s) => D.states[s].metrics[k]);
+        const v = D.states[state].metrics[k], d = v - D.states.baseline.metrics[k];
+        const delta = state === "baseline" ? "Mốc so sánh" : Math.abs(d) < 1e-9 ? "Bằng baseline" : `${d > 0 ? "+" : "−"}${k === "mean_judge_score" ? fmt(1).format(Math.abs(d)) : fmt(2).format(Math.abs(d))} so với baseline`;
+        return `<div class="metric"><div><div class="m-label">${label}</div><div class="m-val" data-k="${k}">${f(0)}</div>
+          <div class="m-delta ${d < -1e-9 ? "neg" : ""}">${delta}</div></div>
+          <div class="bars" role="img" aria-label="${label}: ${STATES.map((s, i) => STATE_LABEL[s] + " " + f(vals[i])).join(", ")}">
+          ${STATES.map((s, i) => `<div class="bar ${s === state ? "cur" : ""}"><i style="height:${Math.max(4, (vals[i] / max) * 48)}px;--i:${i}"></i><span>${STATE_LABEL[s][0]}</span></div>`).join("")}</div></div>`;
+      }).join("")}</div>`;
+    $("metricsCard").querySelectorAll(".m-val").forEach((el) => {
+      const [k, , f] = MET.find((x) => x[0] === el.dataset.k);
+      countUp(el, "m-" + k, D.states[state].metrics[k], f);
+    });
+  }
+
+  function agesFor(s) {
+    if (s === "corrupted") return D.papers.flatMap((p) => (p.corrupted ? Array(p.corrupted.copies).fill(p.corrupted.age_days) : []));
+    return D.papers.map((p) => p.age_days);
+  }
+  function renderAges() {
+    const thr = D.meta.freshness_threshold_days, step = 30;
+    const all = [...agesFor("baseline"), ...agesFor("corrupted")];
+    const top = Math.max(thr * 2, Math.ceil((Math.max(...all) + 1) / 90) * 90);
+    const nb = top / step;
+    const bin = (ages) => { const c = Array(nb).fill(0); ages.forEach((a) => c[Math.min(nb - 1, Math.max(0, Math.ceil(a / step) - 1))]++); return c; };
+    const counts = bin(agesFor(state));
+    const yMax = Math.max(...bin(agesFor("baseline")), ...bin(agesFor("corrupted")), 1);
+    const W = 340, H = 196, pl = 22, pr = 6, pt = 18, pb = 24, cw = (W - pl - pr) / nb, ch = H - pt - pb;
+    const y = (v) => pt + ch - (v / yMax) * ch;
+    let svg = "";
+    [0, Math.ceil(yMax / 2), yMax].forEach((v) => { svg += `<line class="grid-l" x1="${pl}" x2="${W - pr}" y1="${y(v)}" y2="${y(v)}"/><text class="axis" x="${pl - 6}" y="${y(v) + 3}" text-anchor="end">${v}</text>`; });
+    counts.forEach((c, i) => {
+      if (!c) return;
+      const x = pl + i * cw + 1.5, hh = (c / yMax) * ch;
+      svg += `<rect class="${(i + 1) * step > thr ? "b-stale" : "b-fresh"}" style="--i:${i}" x="${x}" y="${pt + ch - hh}" width="${cw - 3}" height="${hh}" rx="2"/>`;
+      svg += `<text class="cnt" x="${x + (cw - 3) / 2}" y="${pt + ch - hh - 5}" text-anchor="middle">${c}</text>`;
+    });
+    for (let d = 0; d <= top; d += 90) svg += `<text class="axis" x="${pl + (d / step) * cw}" y="${H - 6}" text-anchor="middle">${d}</text>`;
+    const tx = pl + (thr / step) * cw;
+    svg += `<line class="thr" x1="${tx}" x2="${tx}" y1="${pt - 6}" y2="${pt + ch}"/><text class="thr-t" x="${tx + 5}" y="${pt - 1}">SLA ${thr} ngày</text>`;
+    const f = D.states[state].freshness;
+    $("agesCard").innerHTML = `
+      <div class="card-h"><span class="eyebrow">Freshness · tuổi bài báo</span>
+        <h2>${f.is_fresh ? "Dữ liệu còn mới" : "Quá nhiều bài đã cũ"}</h2></div>
+      <svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Phân bố tuổi bài báo theo khoảng 30 ngày, ${f.stale_rows} trên ${f.total_rows} bài quá ${thr} ngày">${svg}</svg>
+      <div class="kv">
+        <div><span class="eyebrow">Mới nhất</span><b>${f.latest_published}</b></div>
+        <div><span class="eyebrow">Cũ nhất</span><b class="${f.is_fresh ? "" : "bad-v"}">${f.oldest_published}</b></div>
+        <div><span class="eyebrow">Stale</span><b class="${f.is_fresh ? "" : "bad-v"}">${f.stale_rows}/${f.total_rows} · ${pct(f.stale_ratio, 1)}</b></div>
+      </div>
+      <p class="foot-note">Trục ngang: số ngày từ lúc xuất bản đến lần chạy. Tối đa ${pct(f.max_stale_ratio)} số bài được phép vượt SLA.</p>`;
+  }
+
+  function renderTree() {
+    const sc = D.scenarios, det = sc.filter((s) => s.verdict === "detected").length;
+    const lost = sc.filter((s) => s.verdict !== "detected").map((s) => SC[s.id]?.label || s.id);
+    const b = D.states.baseline.dataset, c = D.states.corrupted.dataset;
+    $("treeCard").innerHTML = `
+      <div class="card-h"><span class="eyebrow">Corruption suite · seed ${D.meta.seed}</span>
+        <h2>6 kịch bản làm hỏng, cổng kiểm định bắt được ${det}</h2>
+        <p>Chọn một kịch bản để lọc bảng bài báo bên dưới theo các dòng bị ảnh hưởng.</p></div>
+      <div class="tree">
+        <div class="root-node"><span class="eyebrow">papers_clean</span><b>${b.rows} → ${c.rows}</b><span>dòng sau khi làm hỏng, còn ${c.unique_paper_ids} paper_id khác nhau</span></div>
+        <ul class="branches">${sc.map((s, i) => {
+          const [cls, txt] = VERDICT[s.verdict];
+          return `<li style="--i:${i}"><button type="button" class="node" data-sc="${s.id}" aria-pressed="${paperFilter === s.id}">
+            <span class="n-t">${esc(SC[s.id]?.label || s.id)}<small>${s.rows} dòng</small></span>
+            <span class="chip ${cls}">${txt}</span>
+            <span class="n-s">${signalText(s)}</span></button></li>`;
+        }).join("")}</ul>
+      </div>
+      <p class="foot-note"><b>Lọt qua:</b> ${esc(lost.join(", "))}. Gợi ý thêm check: title ≥ 8 ký tự, regex ký tự rác trong summary, và cảnh báo khi <code>latest_published</code> lùi lại (${D.states.baseline.freshness.latest_published} → ${D.states.corrupted.freshness.latest_published}).</p>`;
+    $("treeCard").querySelectorAll(".node").forEach((btn) => btn.addEventListener("click", () => {
+      paperFilter = paperFilter === btn.dataset.sc ? "all" : btn.dataset.sc;
+      syncTreePressed(); renderPapers();
+      if (paperFilter !== "all") $("papersCard").scrollIntoView({ behavior: reduce.matches ? "auto" : "smooth", block: "start" });
+    }));
+  }
+  function syncTreePressed() {
+    $("treeCard").querySelectorAll(".node").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.sc === paperFilter)));
+  }
+
+  function renderLineage() {
+    const S = D.states, base = S.baseline.dataset.fingerprint;
+    const rec = MET.map(([k]) => { const b = S.baseline.metrics[k], c = S.corrupted.metrics[k], r = S.repaired.metrics[k]; return b === c ? null : (r - c) / (b - c); }).filter((x) => x !== null);
+    const recovery = rec.length ? Math.min(...rec) : null;
+    $("lineageCard").innerHTML = `
+      <div class="card-h"><span class="eyebrow">Lineage · repair</span><h2>Repair khôi phục đúng bản gốc</h2></div>
+      <div class="rec"><span class="big" id="recNum">${recovery === null ? "–" : "0%"}</span><span>chỉ số RAG được khôi phục từ Corrupted về Baseline</span></div>
+      <div class="fp">${STATES.map((s, i) => {
+        const fp = S[s].dataset.fingerprint, same = fp === base;
+        return `<div class="${s === state ? "now" : ""}" style="--i:${i}"><span class="eyebrow">${STATE_LABEL[s]}</span><code title="${fp}">${fp}</code>
+          <span class="chip ${same ? "pass" : "fail"}">${s === "baseline" ? "Gốc" : same ? "Khớp" : "Khác"}</span></div>`;
+      }).join("")}</div>
+      <p class="foot-note">Fingerprint nội dung của Repaired trùng Baseline: dữ liệu được dựng lại nguyên vẹn từ <code>data/raw</code>, không cần gọi lại API.</p>`;
+    if (recovery !== null) countUp($("recNum"), "rec", recovery, (v) => pct(v), 1200);
+  }
+
+  function renderQuestions() {
+    const si = STATES.indexOf(state);
+    const tiles = D.questions.map((q, n) => {
+      const deg = q.judge[1] < q.judge[0] || q.hit[1] !== q.hit[0];
+      const corr = q.corruptions.length ? q.corruptions.map((c) => SC[c]?.short || c).join(", ") : "Bài gốc không bị chạm";
+      return `<button type="button" class="q ${deg ? "deg" : ""}" style="--i:${n}" data-q="${q.id}" aria-pressed="${q.id === selectedQ}">
+        <span class="q-top"><span class="mono">${q.id}</span><span class="chip">${QTYPE[q.type] || q.type}</span></span>
+        <span class="q-c">${esc(corr)}</span>
+        <span class="marks">${STATES.map((s, i) => {
+          const bad = !q.hit[i] || q.judge[i] < 4;
+          return `<span class="mk ${bad ? "bad" : ""} ${i === si ? "cur" : ""}" title="${STATE_LABEL[s]}: ${q.hit[i] ? "tìm đúng tài liệu" : "không tìm thấy tài liệu đúng"}, judge ${q.judge[i]}/5"><b>${q.judge[i]}</b><span>${q.hit[i] ? "HIT" : "MISS"}</span></span>`;
+        }).join("")}</span></button>`;
+    }).join("");
+    const worse = D.questions.filter((x) => x.judge[1] < x.judge[0] || x.hit[1] !== x.hit[0]).length;
+    $("questionsCard").innerHTML = `
+      <div class="card-h"><span class="eyebrow">Evaluation · ${D.questions.length} câu hỏi · điểm judge / tìm đúng tài liệu</span>
+        <h2>${worse} câu bị ảnh hưởng khi dữ liệu hỏng</h2>
+        <p>Mỗi ô ghi điểm judge (1–5) và retrieval HIT/MISS ở ba trạng thái B · C · R. Viền đỏ là câu bị giảm chất lượng khi dữ liệu hỏng.</p></div>
+      <div class="qgrid">${tiles}</div>
+      <div class="qdetail" id="qdetail" aria-live="polite"></div>`;
+    $("questionsCard").querySelectorAll(".q").forEach((b) => b.addEventListener("click", () => {
+      selectedQ = b.dataset.q;
+      $("questionsCard").querySelectorAll(".q").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.q === selectedQ)));
+      renderQDetail();
+    }));
+    renderQDetail();
+  }
+  function renderQDetail() {
+    const si = STATES.indexOf(state);
+    const q = D.questions.find((x) => x.id === selectedQ) || D.questions[0];
+    const ans = q.answers[si];
+    const el = $("qdetail");
+    el.style.animation = "none"; void el.offsetWidth; el.style.animation = "";
+    el.innerHTML = `
+      <div class="full"><span class="eyebrow">${q.id} · ${QTYPE[q.type] || q.type}</span><h3>${esc(q.question)}</h3></div>
+      <div><span class="eyebrow">Đáp án chuẩn</span><p>${esc(q.ground_truth)}</p></div>
+      <div><span class="eyebrow">Câu trả lời · ${STATE_LABEL[state]} · judge ${q.judge[si]}/5</span>
+        ${ans ? `<p>${esc(ans)}</p>` : `<p class="empty">Trả lời rỗng: summary của bài gốc đã bị xóa trắng.</p>`}</div>
+      <div class="full"><span class="eyebrow">Top-${D.meta.top_k} tài liệu truy xuất · ${STATE_LABEL[state]} · ${q.hit[si] ? "có tài liệu đúng" : "không có tài liệu đúng"}</span>
+        <div class="docs">${q.retrieved[si].map((d, i) => `<code style="--i:${i}" class="${q.ground_truth_doc_ids.includes(d) ? "gt" : ""}">${esc(d)}</code>`).join("")}</div></div>`;
+  }
+
+  function renderPapers() {
+    const thr = D.meta.freshness_threshold_days, cor = state === "corrupted";
+    const counts = Object.fromEntries(D.scenarios.map((s) => [s.id, D.papers.filter((p) => p.flags.includes(s.id)).length]));
+    const rows = D.papers.filter((p) => paperFilter === "all" || p.flags.includes(paperFilter)).sort((a, b) => a.age_days - b.age_days);
+    const body = rows.map((p, n) => {
+      const c = p.corrupted, dropped = cor && !c;
+      const title = cor && c && c.title !== p.title
+        ? `<span class="bad-v">${esc(c.title)}</span><span class="was">${esc(p.title)}</span>` : esc(p.title);
+      const pub = cor && c ? c.published : p.published;
+      const age = cor && c ? c.age_days : p.age_days;
+      const chars = cor && c ? c.summary_chars : p.summary_chars;
+      const extra = [];
+      if (dropped) extra.push(`<span class="chip fail">Đã bị bỏ</span>`);
+      if (cor && c && c.copies > 1) extra.push(`<span class="chip fail">×${c.copies}</span>`);
+      const flags = p.flags.map((f) => `<span class="chip ${cor ? "warn" : "soft"}">${esc(SC[f]?.short || f)}</span>`).join("");
+      return `<tr class="${dropped ? "dropped" : ""}" style="--i:${n}">
+        <td><div class="t-title">${title}</div><a class="t-doi" href="${esc(p.url)}" target="_blank" rel="noopener">${esc(p.id)}</a></td>
+        <td>${esc(p.category)}</td>
+        <td class="num ${age > thr && !dropped ? "bad-v" : ""}">${esc(pub)}</td>
+        <td class="num ${age > thr && !dropped ? "bad-v" : ""}">${age} ngày</td>
+        <td class="num ${chars < D.meta.min_summary_chars && !dropped ? "bad-v" : ""}">${fmt(0).format(chars)}</td>
+        <td><div class="flags">${extra.join("")}${flags || (extra.length ? "" : `<span class="chip soft">Không</span>`)}</div></td></tr>`;
+    }).join("");
+    $("papersCard").innerHTML = `
+      <div class="card-h"><span class="eyebrow">data/clean · ${STATE_LABEL[state]}</span>
+        <h2>${D.papers.length} bài báo và các sự cố trên từng dòng</h2>
+        <p>${cor ? "Đang hiển thị giá trị sau khi làm hỏng: title bị cắt, ngày bị lùi, summary rỗng và dòng bị bỏ." : "Nhãn sự cố cho biết dòng nào sẽ bị làm hỏng ở trạng thái Corrupted."}</p></div>
+      <div class="filters" role="group" aria-label="Lọc theo kịch bản">
+        <button type="button" class="fchip" data-f="all" aria-pressed="${paperFilter === "all"}">Tất cả<small>${D.papers.length}</small></button>
+        ${D.scenarios.map((s) => `<button type="button" class="fchip" data-f="${s.id}" aria-pressed="${paperFilter === s.id}">${esc(SC[s.id]?.short || s.id)}<small>${counts[s.id]}</small></button>`).join("")}
+      </div>
+      <div class="table-scroll"><table>
+        <thead><tr><th>Bài báo</th><th>Loại</th><th class="num">Xuất bản</th><th class="num">Tuổi</th><th class="num">Summary</th><th>Sự cố</th></tr></thead>
+        <tbody>${body || `<tr><td colspan="6" class="muted-row">Không có bài nào khớp bộ lọc.</td></tr>`}</tbody>
+      </table></div>`;
+    $("papersCard").querySelectorAll(".fchip").forEach((b) => b.addEventListener("click", () => { paperFilter = b.dataset.f; syncTreePressed(); renderPapers(); }));
+  }
+
+  function renderStatic() {
+    $("repoLink").href = D.meta.repo;
+    $("srcLabel").textContent = `Nguồn · ${D.meta.source}`;
+    const at = new Date(D.states.repaired.gate.checked_at);
+    const when = isNaN(at) ? "" : at.toLocaleString("vi-VN", { dateStyle: "medium", timeStyle: "short" });
+    $("foot").innerHTML = `<span>Dữ liệu nhúng từ <code>data/quality</code>, <code>data/results</code>, <code>data/clean</code>${when ? " · lần chạy " + when : ""}. Cập nhật: <code>python script/build_dashboard.py</code></span>
+      <a href="${esc(D.meta.repo)}" target="_blank" rel="noopener">THTrueMi · GitHub ↗</a>`;
+  }
+
+  function applyState() {
+    document.documentElement.dataset.state = state;
+    document.querySelectorAll(".switch button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.state === state)));
+    const line = $("stateLine");
+    line.innerHTML = `<span class="state-tag" id="stateTag">${STATE_LABEL[state]}</span><span id="stateNote">${STATE_NOTE[state]}</span>`;
+    renderPipe(); renderGate(); renderMetrics(); renderAges(); renderLineage(); renderQuestions(); renderPapers();
+  }
+
+  /* ---------- Headline: scramble / decode ---------- */
+  const headline = (() => {
+    const els = [...document.querySelectorAll("#headline .line")];
+    const orig = els.map((e) => e.textContent);
+    const POOL = "#*+=/\\|<>_01%!?";
+    const bad = orig.map((t) => {
+      const idx = [...t].map((ch, i) => (ch === " " ? -1 : i)).filter((i) => i >= 0);
+      return idx.sort(() => rnd() - 0.5).slice(0, 3);
+    });
+    let raf = 0;
+    const target = (s) => orig.map((t, li) => (s === "corrupted" ? [...t].map((ch, i) => (bad[li].includes(i) ? POOL[(i * 7 + li * 3) % POOL.length] : ch)).join("") : t));
+    function run(s, dur = 900) {
+      const tgt = target(s);
+      cancelAnimationFrame(raf);
+      if (reduce.matches) { els.forEach((e, i) => (e.textContent = tgt[i])); return; }
+      const t0 = performance.now();
+      const settle = tgt.map((t) => [...t].map(() => 120 + rnd() * dur));
+      const f = (now) => {
+        const t = now - t0;
+        let done = true;
+        els.forEach((e, li) => {
+          e.textContent = [...tgt[li]].map((ch, i) => {
+            if (ch === " " || t >= settle[li][i]) return ch;
+            done = false;
+            return POOL[Math.floor(rnd() * POOL.length)];
+          }).join("");
+        });
+        if (!done) raf = requestAnimationFrame(f);
+      };
+      raf = requestAnimationFrame(f);
+    }
+    return { run };
+  })();
+
+  /* ---------- Hero glitch: corruption / repair in pixels ---------- */
+  const fx = (() => {
+    const hero = document.querySelector(".hero"), canvas = $("fx"), ctx = canvas.getContext("2d");
+    const off = document.createElement("canvas"), octx = off.getContext("2d");
+    let w = 0, h = 0, dpr = 1, cell = 72, cols = 0, rows = 0, cx = 0, cy = 0, bg = "#fff";
+    let cells = [], near = [], lines = [], rays = [], rest = [], raf = 0, t0 = 0, seq = null, pending = false, heroVisible = true;
+
+    function setup() {
+      const r = hero.getBoundingClientRect();
+      w = Math.round(r.width); h = Math.round(r.height);
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      for (const c of [canvas, off]) { c.width = w * dpr; c.height = h * dpr; }
+      bg = getComputedStyle(document.body).backgroundColor;
+      cell = Math.max(44, Math.round(w / 20));
+      cols = Math.ceil(w / cell); rows = Math.ceil(h / cell);
+      const hl = $("headline").getBoundingClientRect();
+      cx = hl.left - r.left + hl.width / 2; cy = hl.top - r.top + hl.height / 2;
+      const cs = getComputedStyle($("headline"));
+      lines = [...document.querySelectorAll("#headline .line")].map((el, i) => {
+        const b = el.getBoundingClientRect();
+        return { text: ["Dữ liệu sạch", "là mặc định"][i] || el.textContent, x: b.left - r.left + b.width / 2, top: b.top - r.top, height: b.height,
+          font: `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`, ls: cs.letterSpacing };
+      });
+      if (!rays.length) rays = Array.from({ length: 170 }, () => ({ a: rnd() * Math.PI * 2, len: 0.35 + rnd() * 0.75, s: 0.003 + rnd() * 0.014, set: rnd() < 0.5 }));
+      cells = [];
+      const maxD = Math.hypot(Math.max(cx, w - cx), Math.max(cy, h - cy));
+      for (let j = 0; j < rows; j++) for (let i = 0; i < cols; i++) {
+        const x = i * cell, y = j * cell;
+        cells.push({ x, y, d: Math.hypot(x + cell / 2 - cx, y + cell / 2 - cy) / maxD, ang: rnd() * Math.PI, segs: [] });
+      }
+      const x0 = hl.left - r.left - cell * 1.5, x1 = hl.right - r.left + cell * 1.5, y0 = hl.top - r.top - cell * 1.5, y1 = hl.bottom - r.top + cell * 1.5;
+      near = cells.filter((c) => c.x + cell > x0 && c.x < x1 && c.y + cell > y0 && c.y < y1);
+      rest = pickRest();
+    }
+    function pickRest() {
+      const n = Math.max(6, Math.round(near.length * 0.12));
+      return near.slice().sort(() => rnd() - 0.5).slice(0, n).map((c) => ({ c, mode: ["black", "rgb", "dark", "black", "rgb"][Math.floor(rnd() * 5)] }));
+    }
+
+    function drawBurst(k, t) {
+      const c = octx;
+      c.setTransform(dpr, 0, 0, dpr, 0, 0);
+      c.globalCompositeOperation = "source-over";
+      c.fillStyle = "#000"; c.fillRect(0, 0, w, h);
+      c.fillStyle = "rgba(255,255,255,.12)";
+      for (let y = 12; y < h; y += 24) for (let x = 12; x < w; x += 24) c.fillRect(x, y, 1.2, 1.2);
+      const R = Math.hypot(w, h) * 0.5 * (0.2 + 0.9 * k);
+      c.globalCompositeOperation = "lighter";
+      const rot = t * 0.00004;
+      for (const pass of [true, false]) {
+        const g = c.createRadialGradient(cx, cy, 0, cx, cy, R);
+        g.addColorStop(0, "rgba(255,255,255,.9)"); g.addColorStop(0.22, "rgba(205,225,255,.55)");
+        g.addColorStop(0.55, "rgba(70,115,255,.22)"); g.addColorStop(1, "rgba(20,40,170,0)");
+        c.fillStyle = g; c.beginPath();
+        for (const r of rays) {
+          if (r.set !== pass) continue;
+          const a = r.a + (pass ? rot : -rot), L = R * r.len * (pass ? 1 : 0.7), s = r.s * (pass ? 1 : 1.8);
+          c.moveTo(cx, cy); c.lineTo(cx + Math.cos(a - s) * L, cy + Math.sin(a - s) * L); c.lineTo(cx + Math.cos(a + s) * L, cy + Math.sin(a + s) * L); c.closePath();
+        }
+        c.fill();
+      }
+      const vb = c.createLinearGradient(0, 0, 0, h);
+      vb.addColorStop(0, "rgba(120,160,255,0)"); vb.addColorStop(0.5, `rgba(210,225,255,${0.5 * Math.min(1, k)})`); vb.addColorStop(1, "rgba(120,160,255,0)");
+      c.fillStyle = vb; c.fillRect(cx - 10, 0, 20, h);
+      const gl = c.createRadialGradient(cx, cy, 0, cx, cy, R * 0.42);
+      gl.addColorStop(0, "rgba(255,255,255,1)"); gl.addColorStop(0.5, "rgba(235,242,255,.85)"); gl.addColorStop(1, "rgba(120,160,255,0)");
+      c.fillStyle = gl; c.fillRect(cx - R, cy - R, R * 2, R * 2);
+      c.globalCompositeOperation = "source-over";
+      c.textAlign = "center"; c.textBaseline = "alphabetic"; c.lineWidth = 1.4;
+      for (const l of lines) {
+        c.font = l.font;
+        if ("letterSpacing" in c) c.letterSpacing = l.ls === "normal" ? "0px" : l.ls;
+        const m = c.measureText(l.text);
+        const fa = m.fontBoundingBoxAscent ?? m.actualBoundingBoxAscent, fd = m.fontBoundingBoxDescent ?? m.actualBoundingBoxDescent;
+        const base = l.top + (l.height - (fa + fd)) / 2 + fa;
+        for (const [col, dx, dy] of [["rgba(255,50,95,.95)", -3, 0], ["rgba(40,255,140,.85)", 3, 1], ["rgba(80,130,255,.95)", 0, -2]]) {
+          c.strokeStyle = col; c.strokeText(l.text, l.x + dx, base + dy);
+        }
+      }
+    }
+
+    function paint(mode, c) {
+      const x = c.x, y = c.y, s = cell;
+      switch (mode) {
+        case "dark": ctx.drawImage(off, x * dpr, y * dpr, s * dpr, s * dpr, x, y, s, s); break;
+        case "black": ctx.fillStyle = "#000"; ctx.fillRect(x, y, s, s); break;
+        case "white": ctx.fillStyle = bg; ctx.fillRect(x, y, s, s); break;
+        case "light": case "warm": {
+          const dx = Math.cos(c.ang) * s, dy = Math.sin(c.ang) * s;
+          const g = ctx.createLinearGradient(x + s / 2 - dx / 2, y + s / 2 - dy / 2, x + s / 2 + dx / 2, y + s / 2 + dy / 2);
+          if (mode === "light") { g.addColorStop(0, "#0B2DFF"); g.addColorStop(0.55, "#5FD3FF"); g.addColorStop(1, "rgba(255,255,255,.9)"); }
+          else { g.addColorStop(0, "#FF8A3D"); g.addColorStop(0.5, "#FFD66B"); g.addColorStop(1, "rgba(255,250,230,.9)"); }
+          ctx.fillStyle = g; ctx.fillRect(x, y, s, s);
+          ctx.strokeStyle = "rgba(255,255,255,.55)"; ctx.lineWidth = 1;
+          ctx.beginPath(); for (let k = 0; k < 3; k++) { const o = (k + 1) * s / 4; ctx.moveTo(x + o, y); ctx.lineTo(x + o - dy * 0.6, y + s); } ctx.stroke();
+          break;
+        }
+        case "rgb": {
+          ctx.fillStyle = "#07070A"; ctx.fillRect(x, y, s, s);
+          ctx.save(); ctx.beginPath(); ctx.rect(x, y, s, s); ctx.clip(); ctx.lineWidth = 2.5;
+          ["#FF2E5B", "#2BFF88", "#3D6BFF"].forEach((col, k) => {
+            ctx.strokeStyle = col; ctx.beginPath();
+            ctx.moveTo(x - 4, y + s * (0.25 + k * 0.22)); ctx.lineTo(x + s * 0.55, y + s * (0.25 + k * 0.22)); ctx.lineTo(x + s * 0.75, y + s + 4); ctx.stroke();
+          });
+          ctx.restore(); break;
+        }
+      }
+    }
+
+    function modeAt(c, t) { for (const [a, b, m] of c.segs) if (t >= a && t < b) return m; return null; }
+
+    function drawRest() {
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, w, h);
+      if (state !== "corrupted") return;
+      if (rest.some((r) => r.mode === "dark")) drawBurst(0.75, 0);
+      rest.forEach((r) => paint(r.mode, r.c));
+    }
+
+    function build(kind) {
+      cells.forEach((c) => (c.segs = []));
+      if (kind === "intro") {
+        cells.forEach((c) => {
+          const on = c.d * 420 + rnd() * 140, lt = 1150 + rnd() * 850, of = lt + 140 + rnd() * 420;
+          c.segs.push([on, lt, rnd() < 0.06 ? "white" : "dark"], [lt, of, rnd() < 0.55 ? "light" : "white"]);
+          if (rnd() < 0.05) c.segs.push([of, of + 300 + rnd() * 500, rnd() < 0.5 ? "warm" : "rgb"]);
+        });
+        return { dur: 3000, keepRest: false, k: (t) => Math.min(1, t / 900) * (1 + 0.3 * Math.max(0, Math.min(1, (t - 900) / 800))) };
+      }
+      if (kind === "corrupt") {
+        cells.forEach((c) => {
+          if (rnd() < 0.6) { const on = c.d * 260 + rnd() * 140; c.segs.push([on, 650 + rnd() * 750, rnd() < 0.1 ? "black" : "dark"]); }
+        });
+        return { dur: 1500, keepRest: false, k: (t) => Math.min(1, t / 300) };
+      }
+      if (kind === "repair") {
+        const prev = new Map(rest.map((r) => [r.c, r.mode]));
+        cells.forEach((c) => {
+          if (prev.has(c)) { const e = 120 + rnd() * 320; c.segs.push([0, e, prev.get(c)], [e, e + 260, "light"]); return; }
+          if (rnd() < 0.45) { const on = c.d * 520 + rnd() * 180; c.segs.push([on, on + 200 + rnd() * 380, "light"]); }
+          else if (rnd() < 0.05) { const on = 500 + rnd() * 400; c.segs.push([on, on + 350, "warm"]); }
+        });
+        return { dur: 1500, keepRest: false, k: () => 0.75 };
+      }
+      if (kind === "blip") {
+        if (state === "corrupted") {
+          rest.forEach((r) => { if (rnd() < 0.35) r.mode = ["black", "rgb", "dark"][Math.floor(rnd() * 3)]; });
+          rest.slice().sort(() => rnd() - 0.5).slice(0, 2).forEach((r) => r.c.segs.push([0, 80 + rnd() * 140, "white"]));
+          near.slice().sort(() => rnd() - 0.5).slice(0, 2).forEach((c) => { if (!c.segs.length) c.segs.push([rnd() * 100, 180 + rnd() * 160, "rgb"]); });
+          return { dur: 360, keepRest: true, k: () => 0.75 };
+        }
+        near.slice().sort(() => rnd() - 0.5).slice(0, 1 + Math.floor(rnd() * 3)).forEach((c) => {
+          const on = rnd() * 200; c.segs.push([on, on + 260 + rnd() * 260, ["warm", "light", "rgb"][Math.floor(rnd() * 3)]]);
+        });
+        return { dur: 760, keepRest: false, k: () => 0 };
+      }
+      cells.forEach((c) => { if (rnd() < 0.2) { const on = rnd() * 400; c.segs.push([on, on + 150 + rnd() * 300, "light"]); } });
+      return { dur: 900, keepRest: false, k: () => 0 };
+    }
+
+    function frame(now) {
+      const t = now - t0;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      ctx.clearRect(0, 0, w, h);
+      const restMode = seq.keepRest ? new Map(rest.map((r) => [r.c, r.mode])) : null;
+      const modes = cells.map((c) => modeAt(c, t) ?? (restMode ? restMode.get(c) ?? null : null));
+      if (modes.includes("dark")) drawBurst(seq.k(t), t);
+      cells.forEach((c, i) => { if (modes[i]) paint(modes[i], c); });
+      if (t < seq.dur) raf = requestAnimationFrame(frame);
+      else {
+        raf = 0; seq = null;
+        if (pending) { pending = false; setup(); }
+        drawRest();
+      }
+    }
+
+    function play(kind) {
+      if (!w) setup();
+      if (raf) { cancelAnimationFrame(raf); raf = 0; }
+      bg = getComputedStyle(document.body).backgroundColor;
+      if (kind === "corrupt" || kind === "intro") rest = pickRest();
+      if (reduce.matches) { seq = null; drawRest(); return; }
+      seq = build(kind); t0 = performance.now(); raf = requestAnimationFrame(frame);
+    }
+
+    let lastW = 0, rt = 0;
+    new ResizeObserver(() => {
+      clearTimeout(rt);
+      rt = setTimeout(() => {
+        const nw = Math.round(hero.getBoundingClientRect().width);
+        if (raf) { pending = true; return; }
+        if (!w && !lastW) return;
+        lastW = nw; setup(); drawRest();
+      }, 150);
+    }).observe(hero);
+    new IntersectionObserver(([e]) => (heroVisible = e.isIntersecting)).observe(hero);
+
+    setInterval(() => {
+      if (raf || !w || !heroVisible || reduce.matches || document.visibilityState !== "visible") return;
+      if (state !== "corrupted" && rnd() < 0.35) return;
+      play("blip");
+    }, 1700);
+
+    return { setup, play, drawRest };
+  })();
+
+  function setState(next) {
+    if (next === state) return;
+    const prev = state;
+    state = next;
+    try { history.replaceState(null, "", "#" + next); } catch (e) {}
+    applyState();
+    fx.play(next === "corrupted" ? "corrupt" : prev === "corrupted" ? "repair" : "soft");
+    headline.run(next, next === "corrupted" ? 700 : 900);
+  }
+  document.querySelectorAll(".switch button").forEach((b) => b.addEventListener("click", () => setState(b.dataset.state)));
+
+  /* Cards below the fold slide up when they enter the viewport; they stay visible if the observer never fires. */
+  function setupReveal() {
+    if (reduce.matches || !("IntersectionObserver" in window)) return;
+    const io = new IntersectionObserver((entries) => entries.forEach((e) => {
+      if (e.isIntersecting) { e.target.classList.remove("pre"); io.unobserve(e.target); }
+    }), { rootMargin: "0px 0px -8% 0px" });
+    let col = 0;
+    document.querySelectorAll(".grid > .card").forEach((card) => {
+      if (card.getBoundingClientRect().top < innerHeight) return;
+      card.style.setProperty("--d", `${(col++ % 3) * 0.08}s`);
+      card.classList.add("pre");
+      io.observe(card);
+    });
+  }
+
+  if (!D.states) {
+    $("gateCard").innerHTML = `<p>Chưa có dữ liệu. Chạy <code>python script/build_dashboard.py</code> sau khi pipeline chạy xong.</p>`;
+    return;
+  }
+  renderStatic();
+  renderTree();
+  applyState();
+  setupReveal();
+  pipeFx.prefill();
+  pipeFx.start();
+
+  const fonts = document.fonts && document.fonts.ready ? Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 1500))]) : Promise.resolve();
+  fonts.then(() => requestAnimationFrame(() => {
+    fx.setup();
+    pipeFx.geo();
+    fx.play("intro");
+    setTimeout(() => headline.run(state, 1300), reduce.matches ? 0 : 1050);
+  }));
+})();
+</script>
+</body>
+</html>
