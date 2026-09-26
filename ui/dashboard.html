@@ -376,6 +376,69 @@ tr.dropped .t-title { text-decoration: line-through; }
 .flags .chip { font-size: 10px; padding: 5px 7px; }
 .muted-row { color: var(--ink-3); font-size: 14px; padding-block: 18px; }
 
+/* Live test chatbot */
+.chat-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px 16px; }
+.conn { display: inline-flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 8px 14px; border-radius: 999px; background: var(--card); font-size: 13.5px; color: var(--ink-2); }
+.conn i { width: 8px; height: 8px; border-radius: 50%; background: var(--ink-3); flex: none; }
+.conn.on i { background: var(--pass); animation: pulse 2s infinite; }
+.conn.warn i { background: var(--warn); }
+.conn.off i { background: var(--fail); }
+.conn button { border: 0; background: transparent; padding: 0; cursor: pointer; font: 500 12.5px var(--display); color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+.toggle { display: inline-flex; align-items: center; gap: 10px; font-size: 14px; cursor: pointer; }
+.toggle input { appearance: none; -webkit-appearance: none; margin: 0; width: 40px; height: 24px; border-radius: 999px; background: var(--line-2); position: relative; cursor: pointer; transition: background-color .2s; flex: none; }
+.toggle input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, .25); transition: transform .25s var(--ease); }
+.toggle input:checked { background: var(--ink); }
+.toggle input:checked::after { transform: translateX(16px); }
+.demo { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.demo-g { display: grid; gap: 8px; align-content: start; }
+.demo-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.qchip {
+  display: flex; flex-direction: column; gap: 4px; min-width: 0; text-align: left; cursor: pointer;
+  padding: 10px 12px; border-radius: 14px; border: 1px solid var(--line-2); background: var(--card-2);
+  font-size: 13.5px; line-height: 1.4; transition: border-color .2s, transform .2s var(--ease), box-shadow .2s;
+}
+.qchip:hover { border-color: var(--ink-3); transform: translateY(-2px); box-shadow: var(--shadow); }
+.qchip:disabled { opacity: .5; cursor: progress; transform: none; }
+.qchip small { font: 500 10.5px/1.3 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+.qchip span { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.chat { display: flex; flex-direction: column; gap: 18px; max-height: 760px; overflow-y: auto; padding: 18px; border-radius: 20px; background: var(--card); }
+.msg-u { align-self: flex-end; max-width: min(680px, 88%); padding: 12px 16px; border-radius: 18px 18px 4px 18px; background: var(--ink); color: var(--bg); font-size: 15px; animation: rise .35s var(--ease) both; overflow-wrap: anywhere; }
+.msg-b { display: grid; gap: 10px; animation: rise .4s var(--ease) both; }
+.msg-b .who { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font: 500 11px/1.3 var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-3); }
+.answers { display: grid; grid-template-columns: repeat(var(--n, 1), minmax(0, 1fr)); gap: 12px; }
+.ans { min-width: 0; display: grid; gap: 10px; align-content: start; padding: 14px 16px; border-radius: 16px; border: 1px solid var(--line); background: var(--card-2); animation: rise .45s var(--ease) both; animation-delay: calc(var(--i) * 90ms); }
+.ans.bad { border-color: var(--fail); }
+.ans-h { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.ans-h .state-tag::before { background: var(--sq); }
+.ans-t { margin: 0; font-size: 14.5px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+.ans-t.empty { color: var(--fail); font-style: italic; }
+.ans-t .caret { display: inline-block; width: 7px; height: 1em; margin-left: 2px; vertical-align: -2px; background: var(--ink-3); animation: blink 1s steps(2, jump-none) infinite; }
+.srcs { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.src { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 3px 10px; padding: 8px 10px; border-radius: 10px; background: var(--card); font-size: 12.5px; }
+.src.gt { box-shadow: inset 0 0 0 1.5px var(--pass); }
+.src .tt { color: var(--ink); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.src code { font-size: 11px; color: var(--ink-3); overflow-wrap: anywhere; }
+.src .sc { font: 500 11.5px var(--mono); color: var(--ink-2); text-align: right; }
+.src .flags { grid-column: 1 / -1; }
+.ans-m { display: flex; flex-wrap: wrap; gap: 6px 10px; align-items: center; font: 11.5px/1.4 var(--mono); color: var(--ink-3); }
+.ans-w { margin: 0; font-size: 12.5px; color: var(--warn); }
+.gt-box { padding: 10px 14px; border-radius: 12px; border: 1px dashed var(--line-2); font-size: 13.5px; color: var(--ink-2); }
+.gt-box b { color: var(--ink); font-weight: 600; }
+.note-b { padding: 12px 16px; border-radius: 14px; background: var(--card-2); border: 1px solid var(--line); font-size: 14px; color: var(--ink-2); }
+.typing { align-self: flex-start; display: inline-flex; align-items: center; gap: 10px; padding: 12px 16px; border-radius: 14px; background: var(--card-2); border: 1px solid var(--line); font-size: 13px; color: var(--ink-3); }
+.typing span { display: inline-flex; gap: 5px; }
+.typing i { width: 8px; height: 8px; border-radius: 2px; background: var(--ink-3); animation: hop 1s infinite; }
+.typing i:nth-child(2) { animation-delay: .15s; }
+.typing i:nth-child(3) { animation-delay: .3s; }
+@keyframes hop { 0%, 60%, 100% { transform: translateY(0); opacity: .4; } 30% { transform: translateY(-5px); opacity: 1; } }
+.composer { display: flex; gap: 10px; }
+.composer input { flex: 1; min-width: 0; padding: 13px 18px; border-radius: 999px; border: 1px solid var(--line-2); background: var(--card-2); color: var(--ink); font: 15px var(--display); }
+.composer input:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+.send { display: inline-flex; align-items: center; gap: 8px; border: 0; cursor: pointer; padding: 12px 20px; border-radius: 999px; background: var(--ink); color: var(--bg); font-weight: 600; font-size: 15px; transition: transform .2s var(--ease), opacity .2s; }
+.send:hover { transform: translateY(-2px); }
+.send:disabled { opacity: .5; cursor: progress; transform: none; }
+.send svg { width: 14px; height: 14px; }
+
 footer { padding-block: 56px 72px; display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; color: var(--ink-3); font-size: 13px; }
 footer a { text-underline-offset: 3px; }
 
@@ -403,6 +466,13 @@ footer a { text-underline-offset: 3px; }
   .branches li::before { left: -18px; width: 18px; }
   .qgrid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .qdetail { grid-template-columns: minmax(0, 1fr); }
+  .demo-list { grid-template-columns: minmax(0, 1fr); }
+  .chat { padding: 12px; }
+  .send span { display: none; }
+}
+@media (max-width: 980px) {
+  .demo { grid-template-columns: minmax(0, 1fr); }
+  .answers { grid-template-columns: minmax(0, 1fr); }
 }
 @media (max-width: 380px) {
   .switch button { padding: 7px 8px; gap: 6px; font-size: 13px; }
@@ -455,6 +525,22 @@ footer a { text-underline-offset: 3px; }
       <div class="card-h" id="pipeHead"></div>
       <div class="pipe" id="pipe"><canvas id="pipeFx" aria-hidden="true"></canvas><ol class="stages" id="stages"></ol></div>
       <p class="foot-note" id="pipeNote"></p>
+    </article>
+    <article class="card plain span-3" id="liveCard">
+      <div class="card-h"><span class="eyebrow">Live test · chatbot RAG</span>
+        <h2>Hỏi agent trên dữ liệu sạch, hỏng và đã phục hồi</h2>
+        <p>Mỗi câu hỏi chạy qua đúng pipeline của dự án: truy xuất top-4 từ ChromaDB của từng trạng thái, rồi LLM trả lời chỉ dựa trên các tài liệu đó. Bật so sánh để thấy cùng một câu hỏi cho ra câu trả lời khác nhau khi dữ liệu bị hỏng.</p></div>
+      <div class="chat-bar">
+        <div class="conn" id="conn" role="status"><i aria-hidden="true"></i><span id="connText">Đang kiểm tra kết nối API…</span></div>
+        <label class="toggle" for="cmpToggle"><input type="checkbox" id="cmpToggle" checked><span>So sánh cả 3 trạng thái</span></label>
+      </div>
+      <div class="demo" id="demo"></div>
+      <div class="chat" id="chat" aria-live="polite"></div>
+      <form class="composer" id="composer" autocomplete="off">
+        <label class="eyebrow" for="chatInput" style="position:absolute;left:-9999px">Câu hỏi</label>
+        <input id="chatInput" type="text" maxlength="500" placeholder="Hỏi về các bài báo trong corpus, tiếng Việt hoặc tiếng Anh…">
+        <button type="submit" class="send" id="sendBtn"><svg viewBox="0 0 14 14" aria-hidden="true"><path d="M1.5 7h10M7.5 2.5 12 7l-4.5 4.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Gửi</span></button>
+      </form>
     </article>
     <article class="card dark" id="gateCard" aria-live="polite"></article>
     <article class="card grey" id="metricsCard"></article>
@@ -511,7 +597,7 @@ footer a { text-underline-offset: 3px; }
     if (reduce.matches || from === to) { el.textContent = format(to); return; }
     const t0 = performance.now();
     const tick = (now) => {
-      const k = Math.min(1, (now - t0) / dur), e = 1 - Math.pow(1 - k, 3);
+      const k = Math.min(1, Math.max(0, (now - t0) / dur)), e = 1 - Math.pow(1 - k, 3);
       el.textContent = format(from + (to - from) * e);
       if (k < 1) requestAnimationFrame(tick);
     };
@@ -679,7 +765,7 @@ footer a { text-underline-offset: 3px; }
     }
     function loop(now) {
       if (dirty || box.clientWidth !== w || box.clientHeight !== h) geo();
-      const dt = Math.min(0.05, (now - last) / 1000);
+      const dt = Math.min(0.05, Math.max(0, (now - last) / 1000));
       last = now;
       step(dt); draw(now);
       raf = requestAnimationFrame(loop);
@@ -1159,6 +1245,175 @@ footer a { text-underline-offset: 3px; }
     return { setup, play, drawRest };
   })();
 
+  /* ---------- Live test: RAG chatbot against the local API ---------- */
+  const chat = (() => {
+    const PBY = Object.fromEntries(D.papers.map((p) => [p.id, p]));
+    const QBY = Object.fromEntries(D.questions.map((q) => [q.question.trim().toLowerCase(), q]));
+    const short = (t, n) => (t && t.length > n ? t.slice(0, n - 1) + "…" : t || "");
+    const bases = [];
+    if (location.protocol.startsWith("http")) bases.push("/api");
+    if (!["127.0.0.1:8765", "localhost:8765"].includes(location.host)) bases.push("http://127.0.0.1:8765/api");
+    let api = null, health = null, busy = false;
+
+    const DEMO_TEST = ["eval_003", "eval_009", "eval_001", "eval_005"];
+    const DEMO_OPEN = [
+      ["Bài mới nhất, bị bỏ ở Corrupted", "What is the DOLPHIN framework for digital investigation readiness?"],
+      ["Bài bị bỏ ở Corrupted", "How is reinforcement learning used to improve retrieval-augmented generation?"],
+      ["Câu hỏi mở · y tế", "Which papers apply retrieval-augmented generation to medical diagnosis?"],
+      ["Hỏi bằng tiếng Việt", "Có nghiên cứu nào dùng RAG để kiểm tra tuân thủ quy định (regulatory compliance) không?"],
+    ];
+
+    function withTimeout(ms) {
+      const c = new AbortController();
+      setTimeout(() => c.abort(), ms);
+      return c.signal;
+    }
+    async function connect() {
+      setConn("", "Đang kiểm tra kết nối API…");
+      for (const base of bases) {
+        try {
+          const r = await fetch(base + "/health", { signal: withTimeout(1500) });
+          if (!r.ok) continue;
+          health = await r.json(); api = base;
+          if (health.llm_ready) setConn("on", `Đã kết nối API · LLM ${esc(health.provider)} · ${esc(health.model)}`);
+          else setConn("warn", `Đã kết nối API · chưa có API key cho LLM, agent trả lời bằng trích xuất`);
+          return;
+        } catch (e) {}
+      }
+      api = null; health = null;
+      setConn("off", `Chưa kết nối API. Chạy <code>python script/serve_dashboard.py</code> rồi mở <code>http://127.0.0.1:8765</code>. Câu hỏi trong test set vẫn phát lại câu trả lời đã ghi.`, true);
+    }
+    function setConn(cls, html, retry = false) {
+      $("conn").className = "conn " + cls;
+      $("connText").innerHTML = html + (retry ? ` <button type="button" id="reconnect">Kết nối lại</button>` : "");
+      if (retry) $("reconnect").addEventListener("click", connect);
+    }
+
+    function renderDemo() {
+      const tests = DEMO_TEST.map((id) => D.questions.find((q) => q.id === id)).filter(Boolean);
+      $("demo").innerHTML = `
+        <div class="demo-g"><span class="eyebrow">Từ test set · có đáp án chuẩn</span><div class="demo-list">${tests.map((q) =>
+          `<button type="button" class="qchip" data-q="${esc(q.question)}"><small>${q.id} · ${q.corruptions.map((c) => SC[c]?.short || c).join(" + ") || "Không bị chạm"}</small><span>${esc(q.question)}</span></button>`).join("")}</div></div>
+        <div class="demo-g"><span class="eyebrow">Câu hỏi mở · cần API</span><div class="demo-list">${DEMO_OPEN.map(([label, q]) =>
+          `<button type="button" class="qchip" data-q="${esc(q)}"><small>${esc(label)}</small><span>${esc(q)}</span></button>`).join("")}</div></div>`;
+      $("demo").querySelectorAll(".qchip").forEach((b) => b.addEventListener("click", () => send(b.dataset.q)));
+    }
+
+    function scroll() { const c = $("chat"); c.scrollTop = c.scrollHeight; }
+    function addUser(text) {
+      $("chat").insertAdjacentHTML("beforeend", `<div class="msg-u">${esc(text)}</div>`);
+      scroll();
+    }
+    function typeInto(el, text) {
+      if (reduce.matches || !text) { el.textContent = text; return; }
+      let i = 0;
+      const step = Math.max(2, Math.round(text.length / 90));
+      const caret = document.createElement("span"); caret.className = "caret";
+      const tick = () => {
+        i = Math.min(text.length, i + step);
+        el.textContent = text.slice(0, i); el.appendChild(caret);
+        if (i < text.length) requestAnimationFrame(tick); else caret.remove();
+      };
+      tick();
+    }
+
+    function answerCard(a, i, q) {
+      const st = a.state, si = STATES.indexOf(st);
+      const counts = a.retrieved.reduce((m, r) => ((m[r.paper_id] = (m[r.paper_id] || 0) + 1), m), {});
+      const hit = q ? a.retrieved.some((r) => q.ground_truth_doc_ids.includes(r.paper_id)) : null;
+      const empty = !a.answer || !a.answer.trim();
+      const badge = a.mode === "llm" ? `LLM · ${esc(a.model)}` : a.mode === "recorded" ? "Bản ghi pipeline" : "Trích xuất";
+      const judge = a.mode === "recorded" && q ? ` · judge ${q.judge[si]}/5` : "";
+      const srcs = a.retrieved.map((r) => {
+        const p = PBY[r.paper_id], flags = st === "corrupted" && p ? p.flags : [];
+        return `<li class="src ${q && q.ground_truth_doc_ids.includes(r.paper_id) ? "gt" : ""}">
+          <span class="tt" title="${esc(r.title || p?.title || "")}">${esc(short(r.title || p?.title || r.paper_id, 70))}</span>
+          <span class="sc">${r.score == null ? "" : fmt(3).format(r.score)}${counts[r.paper_id] > 1 ? " · ×" + counts[r.paper_id] : ""}</span>
+          <code>${esc(r.paper_id)}</code>
+          ${flags.length ? `<span class="flags">${flags.map((f) => `<span class="chip warn">${esc(SC[f]?.short || f)}</span>`).join(" ")}</span>` : ""}</li>`;
+      }).join("");
+      const bad = empty || hit === false || (a.mode === "recorded" && q && q.judge[si] < 4);
+      return `<div class="ans ${bad ? "bad" : ""}" style="--i:${i};--sq:var(--st-${st})">
+        <div class="ans-h"><span class="state-tag">${STATE_LABEL[st]}</span>
+          ${hit === null ? "" : `<span class="chip ${hit ? "pass" : "fail"}">${hit ? "Tìm đúng tài liệu" : "Không thấy tài liệu đúng"}</span>`}</div>
+        <p class="ans-t ${empty ? "empty" : ""}" data-text="${esc(empty ? "Trả lời rỗng: tài liệu truy xuất được không có nội dung để trả lời." : a.answer)}"></p>
+        <ul class="srcs" aria-label="Tài liệu truy xuất">${srcs}</ul>
+        <div class="ans-m"><span>${badge}${judge}</span>${a.latency_ms != null ? `<span>${fmt(0).format(a.latency_ms)} ms</span>` : ""}</div>
+        ${a.warning ? `<p class="ans-w">${esc(a.warning)}</p>` : ""}</div>`;
+    }
+
+    function addBot(answers, q, note) {
+      const el = document.createElement("div");
+      el.className = "msg-b";
+      const src = answers[0]?.mode === "recorded" ? "phát lại từ data/results" : api ? "API cục bộ" : "";
+      el.innerHTML = `<div class="who"><span>Agent</span>${src ? `<span>· ${src}</span>` : ""}${q ? `<span>· ${q.id}</span>` : ""}</div>
+        ${note ? `<div class="note-b">${note}</div>` : ""}
+        ${answers.length ? `<div class="answers" style="--n:${answers.length}">${answers.map((a, i) => answerCard(a, i, q)).join("")}</div>` : ""}
+        ${q ? `<div class="gt-box"><b>Đáp án chuẩn:</b> ${esc(short(q.ground_truth, 260))}</div>` : ""}`;
+      $("chat").appendChild(el);
+      el.querySelectorAll(".ans-t").forEach((p, i) => setTimeout(() => typeInto(p, p.dataset.text), i * 120));
+      scroll();
+    }
+
+    function recorded(q, states) {
+      return states.map((st) => {
+        const si = STATES.indexOf(st);
+        return { state: st, answer: q.answers[si], mode: "recorded", retrieved: q.retrieved[si].map((id) => ({ paper_id: id, title: PBY[id]?.title, score: null })) };
+      });
+    }
+
+    function setBusy(v) {
+      busy = v;
+      $("sendBtn").disabled = v;
+      $("demo").querySelectorAll(".qchip").forEach((b) => (b.disabled = v));
+    }
+
+    async function send(text) {
+      const question = text.trim();
+      if (!question || busy) return;
+      const states = $("cmpToggle").checked ? STATES.slice() : [state];
+      const q = QBY[question.toLowerCase()] || null;
+      addUser(question);
+      $("chatInput").value = "";
+      setBusy(true);
+      const typing = document.createElement("div");
+      typing.className = "typing";
+      typing.innerHTML = `<span aria-hidden="true"><i></i><i></i><i></i></span>${api ? `Đang truy xuất và hỏi LLM trên ${states.length} collection…` : "Đang tìm câu trả lời đã ghi…"}`;
+      $("chat").appendChild(typing); scroll();
+      try {
+        if (api) {
+          const r = await fetch(api + "/chat", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ question, states }), signal: withTimeout(90000) });
+          const data = await r.json().catch(() => ({}));
+          typing.remove();
+          if (!r.ok) addBot([], null, `API báo lỗi: ${esc(data.error || r.status)}`);
+          else addBot(data.answers, q);
+        } else {
+          await new Promise((res) => setTimeout(res, reduce.matches ? 0 : 650));
+          typing.remove();
+          if (q) addBot(recorded(q, states), q);
+          else addBot([], null, `Câu hỏi này cần API cục bộ để truy xuất và gọi LLM. Chạy <code>python script/serve_dashboard.py</code>, mở <code>http://127.0.0.1:8765</code> rồi hỏi lại. Khi chưa có API, bạn vẫn chọn được 4 câu hỏi trong test set để xem câu trả lời đã ghi.`);
+        }
+      } catch (e) {
+        typing.remove();
+        addBot([], null, `Không gọi được API (${esc(e.name === "AbortError" ? "quá thời gian chờ" : e.message)}). Kiểm tra server còn chạy không rồi bấm "Kết nối lại".`);
+        connect();
+      }
+      setBusy(false);
+    }
+
+    function init() {
+      renderDemo();
+      const first = D.questions.find((x) => x.id === DEMO_TEST[0]);
+      if (first) {
+        addUser(first.question);
+        addBot(recorded(first, STATES), first, "Ví dụ ghi lại từ lần chạy pipeline. Chọn một câu hỏi demo hoặc tự gõ câu hỏi để chạy trực tiếp.");
+      }
+      $("composer").addEventListener("submit", (e) => { e.preventDefault(); send($("chatInput").value); });
+      connect();
+    }
+    return { init };
+  })();
+
   function setState(next) {
     if (next === state) return;
     const prev = state;
@@ -1192,6 +1447,7 @@ footer a { text-underline-offset: 3px; }
   renderStatic();
   renderTree();
   applyState();
+  chat.init();
   setupReveal();
   pipeFx.prefill();
   pipeFx.start();

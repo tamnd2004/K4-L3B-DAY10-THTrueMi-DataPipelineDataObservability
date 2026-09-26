@@ -22,13 +22,14 @@
 | Bóc tách & chuẩn hóa payload         | `src/ingestion/crossref.py` — `parse_crossref_payload`                   | Payload JSON `/works` của Crossref                                                  | `list[PaperRecord]` + `data/raw/crossref_records.json`         | Hoàn thành  |
 | Đọc lại raw records cho các bước sau | `src/ingestion/crossref.py` — `load_raw_records`                         | `data/raw/crossref_records.json`                                                    | `list[PaperRecord]` cho `cleaning.py`                          | Hoàn thành  |
 
-Output của tôi là đầu vào trực tiếp của `build_clean_dataframe` (`cleaning.py`), gián tiếp cho `testset.py` (ground-truth doc IDs là DOI do tôi bóc tách) và cho bước Repair (khôi phục từ raw snapshot).
+Output của tôi là đầu vào trực tiếp của `build_clean_dataframe` (`cleaning.py`) và gián tiếp của `testset.py` (ground-truth doc IDs là DOI do tôi bóc tách). `load_raw_records` được dùng ở hai chỗ quan trọng: `pipelines/phase1.py` mặc định đọc raw snapshot để kết quả tái lập được (chỉ gọi Crossref live khi `REFRESH_SOURCE=1`), và `repair_from_raw_snapshot` trong `pipelines/corruption_flow.py` dựng lại dữ liệu sạch từ `data/raw/crossref_records.json`.
 
 ### Việc hỗ trợ ngoài phạm vi chính
 
 | Hoạt động                                          | Thành viên/module được hỗ trợ | Kết quả                                                                                                   |
 | ----------------------------------------------------- | ------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
 | Kiểm tra tích hợp raw records với module cleaning | `src/ingestion/cleaning.py`          | Chạy lệnh kiểm tra Bước 3 trên raw data của tôi → `Clean thành công 24 dòng`, không mất bản ghi nào. |
+| Xây dashboard observability (bonus B1)              | Cả nhóm; đọc artifact của `quality.py`, `corruption_flow.py`, `metrics.py` | `ui/dashboard.html` + `script/build_dashboard.py` (commit `6d6ddf0`): pipeline 7 bước, quality gate, histogram tuổi bài báo với SLA 180 ngày, cây 6 kịch bản corruption, fingerprint lineage và tác động từng câu hỏi qua 3 trạng thái. |
 
 ## 3. Kết quả theo vai trò
 
@@ -38,8 +39,10 @@ Output của tôi là đầu vào trực tiếp của `build_clean_dataframe` (`
 | Chuẩn hóa DOI, title, abstract (bỏ thẻ `<jats:p>`), authors, categories, ngày | `parse_crossref_payload`              | `crossref_records.json` (24 records)             | Parse snapshot gốc của đề → khớp 100% với `crossref_records.json` mẫu |
 | Kiểm thử nhánh fallback khi mất mạng                                       | `fetch_source_records`                 | Pipeline không gián đoạn khi API lỗi            | Trỏ API về cổng đóng → 3 lần thử thất bại → đọc snapshot → 24 records |
 | Commit & push code + raw artifacts                                           | commit `582fb95`                       | Raw data lineage có trên repo nhóm               | `git log` trên `main`                                                |
+| Raw snapshot làm nguồn cho Repair                                          | `data/raw/crossref_records.json`, `load_raw_records` | Dữ liệu Repaired giống hệt Baseline            | Fingerprint `8b5b9cc5e8239eab` ở cả `baseline_quality_report.json` và `repaired_quality_report.json` |
+| Dashboard observability                                                     | `ui/dashboard.html`, `script/build_dashboard.py` | Trang HTML tự chứa, nhúng số liệu thật từ `data/` | `python script/build_dashboard.py` → `Dashboard updated ... (31 KB data)` |
 
-Output cụ thể: `data/raw/crossref_records.json` gồm **24 bài báo** xuất bản trong khoảng **2026-04-01 → 2026-09-15** (trong cửa sổ freshness 180 ngày), summary dài 826–3814 ký tự, không bản ghi nào thiếu tác giả. Quality gate của thành viên phụ trách `quality.py` chạy trên dữ liệu này đạt **6/6 expectations**, `stale_rows = 0`, `is_fresh = true` (`data/quality/test_quality_report.json`). Cả 10 câu hỏi trong `data/eval/test_set.json` đều dùng `ground_truth_doc_ids` là DOI lấy từ records của tôi.
+Output cụ thể: `data/raw/crossref_records.json` gồm **24 bài báo** xuất bản trong khoảng **2026-04-01 → 2026-09-15** (trong cửa sổ freshness 180 ngày), summary dài 826–3814 ký tự, không bản ghi nào thiếu tác giả. Quality gate chạy trên dữ liệu này đạt **6/6 expectations**, `stale_rows = 0`, `is_fresh = true` (`data/quality/baseline_quality_report.json`). Cả 10 câu hỏi trong `data/eval/test_set.json` đều dùng `ground_truth_doc_ids` là DOI lấy từ records của tôi. Sau corruption, bước Repair đọc lại chính file này và cho ra đúng fingerprint của Baseline, nên toàn bộ metric được khôi phục 100%.
 
 ## 4. Giải thích phần kỹ thuật đã thực hiện
 
@@ -116,39 +119,38 @@ python -c "import ingestion.crossref as c; c.CROSSREF_WORKS_URL='http://127.0.0.
 2. **Evaluation set:** mỗi câu hỏi trong `test_set.json` có `ground_truth` (câu trả lời đúng) và `ground_truth_doc_ids` (DOI của bài chứa đáp án). `retrieval_hit_rate` đo tỉ lệ câu hỏi mà top-k tài liệu truy xuất có chứa DOI đúng → đo chất lượng retrieval. `mean_token_f1`, `judge_accuracy`, `mean_judge_score` so câu trả lời của agent với `ground_truth` → đo chất lượng answer.
 3. **Quality checks vs freshness:** quality checks kiểm tra *tính đúng đắn về cấu trúc/nội dung* tại một thời điểm (số dòng, not-null, unique `paper_id`, độ dài summary). Freshness kiểm tra *dữ liệu còn mới không* theo thời gian: dựa trên `age_days` so với ngưỡng 180 ngày và tỉ lệ dòng stale. Dữ liệu có thể pass hết quality checks nhưng vẫn stale (vd corruption "lùi ngày 365 ngày").
 4. **Cùng test set:** để thay đổi metric chỉ đến từ thay đổi dữ liệu (baseline/corrupted/repaired), không phải do câu hỏi dễ/khó khác nhau. Đây là nguyên tắc biến kiểm soát — đổi test set thì so sánh mất ý nghĩa.
-5. **Repair thành công khi:** dữ liệu được dựng lại từ raw snapshot (`crossref_records.json` / `crossref_response.json`), quality report pass lại toàn bộ expectations, freshness `is_fresh = true`, và các metric (`retrieval_hit_rate`, `mean_token_f1`, `judge_accuracy`) quay về xấp xỉ baseline trên cùng test set.
+5. **Repair thành công khi:** dữ liệu được dựng lại từ raw snapshot (`data/raw/crossref_records.json`), `repaired_quality_report.json` pass lại 6/6 expectations, freshness `is_fresh = true`, và các metric trong `repaired_metrics.json` quay về bằng baseline trên cùng test set. Bằng chứng mạnh nhất là fingerprint nội dung: Repaired `8b5b9cc5e8239eab` trùng Baseline, trong khi Corrupted là `7bf7953b239d393a`. Nhờ vậy repair là idempotent: chạy lại bao nhiêu lần cũng ra cùng một dữ liệu.
 
 ## 8. Phân tích kết quả
 
-> Tại thời điểm viết (2026-09-26), nhóm chưa chạy `script/run_phase1.py` và `script/run_corruption_flow.py`, thư mục `data/results/` còn trống. Các ô dưới đây sẽ được cập nhật khi có artifact; tôi không điền số chưa kiểm chứng.
+Nguồn số liệu: `data/results/{baseline,corrupted,repaired}_metrics.json`, `data/quality/*_quality_report.json`, `data/results/corruption_log.json` và `data/reports/corruption_report.md`. Cả 3 trạng thái dùng cùng test set 10 câu hỏi và LLM judge cho cả 10/10 câu trả lời.
 
 ### Metrics chính
 
 | Metric/signal          | Baseline | Corrupted | Repaired | Nhận xét của cá nhân |
 | ---------------------- | -------: | --------: | -------: | ------------------------- |
-| `retrieval_hit_rate` | Chưa có | Chưa có | Chưa có | Chờ `data/results/*_metrics.json` |
-| `mean_token_f1`      | Chưa có | Chưa có | Chưa có | Chờ `data/results/*_metrics.json` |
-| `judge_accuracy`     | Chưa có | Chưa có | Chưa có | Chờ `data/results/*_metrics.json` |
-| `mean_judge_score`   | Chưa có | Chưa có | Chưa có | Chờ `data/results/*_metrics.json` |
-| Quality checks         | 6/6 pass¹ | Chưa có | Chưa có | Raw data của tôi qua được toàn bộ gate |
-| Freshness status       | Fresh¹ (0/24 stale) | Chưa có | Chưa có | Bài cũ nhất 2026-04-01, trong ngưỡng 180 ngày |
-
-¹ Từ `data/quality/test_quality_report.json` (lần chạy thử quality gate trên dữ liệu sạch, 2026-09-26).
+| `retrieval_hit_rate` |     1.00 |      0.90 |     1.00 | Chỉ `eval_009` bị miss: bài gốc `10.21203/rs.3.rs-10349437/v1` bị `drop_latest_records` xóa, và bản trùng `10.21203/rs.3.rs-10423755/v1` chiếm 2/4 chỗ top-k. |
+| `mean_token_f1`      |     1.00 |      0.90 |     1.00 | Giảm hoàn toàn do `eval_003`: summary bị xóa trắng nên agent trả lời rỗng, F1 1.00 → 0.00. |
+| `judge_accuracy`     |     1.00 |      0.90 |     1.00 | Chỉ `eval_003` sai. `eval_009` miss retrieval nhưng vẫn được chấm đúng (xem phần "khác kỳ vọng"). |
+| `mean_judge_score`   |      5.0 |       4.6 |      5.0 | `eval_003` từ 5 xuống 1 kéo trung bình giảm 0.4. |
+| Quality checks         | PASS 6/6 | FAIL 4/6 | PASS 6/6 | Fail ở `paper_id` unique (6 dòng: 3 id bị nhân đôi, tính cả 2 bản) và `summary ≥ 30 ký tự` (3 dòng rỗng). |
+| Freshness status       | FRESH, 0/24 stale | STALE, 8/22 stale (36.4%) | FRESH, 0/24 stale | 8 dòng stale = 6 dòng bị lùi ngày + 2 bản trùng của chính các dòng đó; vượt ngưỡng 25%. |
+| Rows / unique `paper_id` | 24 / 24 | 22 / 19 | 24 / 24 | 24 − 5 dòng bị bỏ + 3 dòng nhân đôi = 22 dòng. |
+| Content fingerprint    | `8b5b9cc5e8239eab` | `7bf7953b239d393a` | `8b5b9cc5e8239eab` | Repaired trùng Baseline: raw snapshot của tôi là nguồn phục hồi chính xác. |
 
 ### Kết luận từ số liệu
 
-Chưa đủ số liệu để kết luận. Giả thuyết cần kiểm chứng khi có kết quả:
-
-1. Duplicate rows / blank summary / stale date → gate `unique paper_id`, `summary length`, freshness fail → `retrieval_hit_rate` giảm do bản trùng chiếm chỗ trong top-k và bài bị xóa summary không còn được truy xuất.
-2. Repair từ `data/raw/crossref_records.json` → gate và freshness pass lại → metric quay về xấp xỉ baseline, vì raw snapshot không bị corruption chạm vào.
+1. **Blank summary** (3 dòng) → gate `summary ≥ 30 ký tự` FAIL (3 dòng lỗi) → `eval_003` vẫn truy xuất đúng tài liệu nhưng trả lời rỗng: judge 5 → 1, token F1 1.00 → 0.00, kéo `mean_token_f1` và `judge_accuracy` xuống 0.90. **Duplicate rows + drop latest** → gate unique FAIL (6 dòng), nhưng row count vẫn PASS (22 dòng) → `eval_009` mất tài liệu gốc, `retrieval_hit_rate` 1.00 → 0.90.
+2. **Repair** đọc lại `data/raw/crossref_records.json` → gate PASS 6/6, freshness FRESH 0/24, fingerprint trùng Baseline → cả 4 metric quay về đúng Baseline, tức khôi phục 100% `(Repaired − Corrupted) / (Baseline − Corrupted)`.
 
 Corruption nào ảnh hưởng rõ nhất và vì sao?
 
-Chưa có số liệu. Dự đoán: *blank summary* và *drop latest records* ảnh hưởng mạnh nhất vì làm mất trực tiếp nội dung chứa đáp án của các câu hỏi loại `summary`.
+**Blank summary** ảnh hưởng rõ nhất: đây là lỗi duy nhất làm agent trả lời sai (`eval_003`, judge 5 → 1). Retrieval vẫn tìm đúng bài vì title và metadata còn nguyên trong `text_for_embedding`, nhưng phần nội dung chứa đáp án đã mất, nên agent không có gì để trả lời. Điều này cho thấy retrieval hit không đủ để đánh giá; phải đo cả chất lượng câu trả lời. **Duplicate rows** nguy hiểm theo cách khác: một bài trùng chiếm 2/4 chỗ top-k ở cả `eval_007` và `eval_009`, làm giảm độ đa dạng ngữ cảnh.
 
 Kết quả nào khác với kỳ vọng ban đầu?
 
-Ở phần của tôi: dữ liệu Crossref live khác snapshot mẫu (không có `subject`, có bài tiếng Nga/Indonesia) — đã xử lý như mục 6. Phần metrics sẽ cập nhật sau.
+- **`eval_009` miss retrieval nhưng vẫn được chấm đúng.** Giả thuyết: câu hỏi loại *categories* có đáp án `posted-content`, mà vì Crossref live không trả `subject`, tôi đã fallback sang `type` (mục 6). Trường này chỉ có 3 giá trị trong toàn bộ dữ liệu (`journal-article` 15, `posted-content` 8, `report` 1), nên agent đọc một bài khác cùng loại vẫn trả lời "đúng". Kiểm tra: tài liệu top-1 của `eval_009` ở trạng thái Corrupted là `10.21203/rs.3.rs-10423755/v1`, cũng là `posted-content`. Kết luận: quyết định ở phần ingestion của tôi làm câu hỏi *categories* kém phân biệt, và `judge_accuracy` đánh giá quá cao chất lượng thật cho loại câu hỏi này.
+- **3/6 kịch bản lọt qua gate mà metric cũng không đổi.** `inject_noise` (`eval_005`, `eval_007`, `eval_008`) và `truncate_title` (`eval_001`) vẫn đạt judge 5 vì câu hỏi hỏi tác giả, ngày hoặc summary, là những trường không bị chạm. `drop_latest_records` chỉ lộ ra qua `latest_published` lùi từ 2026-09-15 về 2026-08-26 chứ row count vẫn PASS. Đây là silent failure thật sự: cả gate lẫn metric đều không báo.
 
 ## 9. Điều học được và hướng cải thiện
 
@@ -160,7 +162,7 @@ Kết quả nào khác với kỳ vọng ban đầu?
 
 ### Nếu có thêm thời gian
 
-Thêm kiểm tra **ngôn ngữ** ở bước ingestion/quality gate (vd lọc hoặc gắn cờ bài không phải tiếng Anh), vì dữ liệu live có bài tiếng Nga và tiếng Indonesia trong khi test set và embedding model (MiniLM tiếng Anh) tối ưu cho tiếng Anh. Cách đo: chạy baseline hai lần — có và không có bộ lọc — trên cùng test set, so sánh `retrieval_hit_rate` và `mean_token_f1`.
+Làm `categories` có ý nghĩa hơn ở bước ingestion: khi Crossref không có `subject`, lấy thêm `container-title` (tên tạp chí/nơi đăng) hoặc tra khái niệm từ OpenAlex theo DOI, thay vì chỉ dùng `type` với 3 giá trị. Lý do: kết quả mục 8 cho thấy `eval_009` được chấm đúng dù truy xuất sai tài liệu, vì `type` quá ít giá trị. Cách đo: đếm số giá trị khác nhau của `primary_category` (hiện là 3), rồi chạy lại corruption flow trên cùng test set và kiểm tra câu hỏi *categories* có bị chấm sai khi tài liệu gốc bị drop hay không. Nếu có, metric đã phản ánh đúng tác động thật. Ngoài ra nên thêm bộ lọc hoặc cờ ngôn ngữ, vì dữ liệu live có bài tiếng Nga và tiếng Indonesia trong khi MiniLM tối ưu cho tiếng Anh.
 
 ## 10. Cam kết của thành viên
 
