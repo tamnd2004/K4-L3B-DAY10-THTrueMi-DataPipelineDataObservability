@@ -1,58 +1,54 @@
-# Danh Sách Thành Viên & Báo Cáo Phân Công Nhóm
+# Danh sách thành viên và phân công nhóm
 
-- **Tên Nhóm:** `[Điền tên nhóm]`
-- **Mã Nhóm / Lớp:** `K4-L3-DAY10`
-- **Tên Repository Nộp Bài:** `K4-L3-DAY10-TenNhom-DataPipeline`
+- **Tên nhóm:** THTrueMi
+- **Khóa/Lớp:** K4-L3B-DAY10
+- **Repository:** https://github.com/tamnd2004/K4-L3B-DAY10-THTrueMi-DataPipelineDataObservability
+- **Ngày xác nhận:** 2026-09-26
 
----
+## Thành viên
 
-## # Thành viên
-
-| STT | Họ và tên | MSSV | Email | Vai trò & Phân công công việc | Báo cáo cá nhân |
+| STT | Họ và tên | MSSV | Email | Vai trò và phạm vi | Báo cáo cá nhân |
 |---:|---|---|---|---|---|
-| 1 | | | | Trưởng nhóm / Pipeline Integrator (`core/`, `phase1.py`, `corruption_flow.py`) | `report/<MSSV1>_HoTen.md` |
-| 2 | | | | Data Foundation & Recovery (`crossref.py`, `cleaning.py`, raw data) | `report/<MSSV2>_HoTen.md` |
-| 3 | | | | RAG & Vector Index (`retrieval/index.py`, `embeddings.py`, ChromaDB) | `report/<MSSV3>_HoTen.md` |
-| 4 | | | | Observability & Evaluation (`quality.py` GX 1.x, `testset.py`, reporting) | `report/<MSSV4>_HoTen.md` |
+| 1 | Nguyễn Thị Hải Mi | 2A202602667 | haimi612003@gmail.com  | Raw Data Ingestion & Data Lineage; hỗ trợ dashboard | [`individual-2A202602667-NguyenThiHaiMi.md`](../report/individual-2A202602667-NguyenThiHaiMi.md) |
+| 2 | Mai Huy Hoàng | 2A202602685 | huyhoangg1706@gmail.com  | Data Cleaning & Pre-embed Modeling | [`individual_2A202602685_MaiHuyHoang.md`](../report/individual_2A202602685_MaiHuyHoang.md) |
+| 3 | Trần Nguyễn Trí Dũng | 2A202602784 | trantridung38@gmail.com | Benchmark Evaluation Test Set; tích hợp evaluation | [`individual_2A202602784_TranNguyenTriDung.md`](../report/individual_2A202602784_TranNguyenTriDung.md) |
+| 4 | Nguyễn Đức Tâm | 2A202602921 | tamnd04@gmail.com | Quality Gate, Freshness, Corruption/Repair & Pipeline Integration | [`individual_2A202602921_NguyenDucTam.md`](../report/individual_2A202602921_NguyenDucTam.md) |
 
-*(Nếu nhóm có 3 hoặc 5-6 thành viên, xem bảng phân công chi tiết theo vai trò trong file `CHECKPOINTS.md`)*.
+## Phân công và bằng chứng bàn giao
 
----
+### Nguyễn Thị Hải Mi — Raw Data Ingestion & Lineage
 
-## # Cá nhân
+- Hoàn thiện retry/backoff cho Crossref, fallback về snapshot khi API lỗi và bảo vệ snapshot chỉ sau khi response hợp lệ.
+- Parse DOI, title, abstract, authors, categories và ngày xuất bản thành `PaperRecord` trong `src/ingestion/crossref.py`.
+- Bàn giao `data/raw/crossref_response.json` và `data/raw/crossref_records.json` gồm 24 records; raw snapshot được dùng làm nguồn repair.
+- Hỗ trợ xây dashboard đọc artifacts thật trong `ui/dashboard.html` và `script/build_dashboard.py`.
 
-### ## HoVaTen1-MSSV1
-- **Vai trò:** Trưởng nhóm & Điều phối Pipeline.
-- **Công việc chi tiết đã hoàn thành:**
-  - Thiết lập cấu hình hệ thống `core/config.py` và đường dẫn artifacts `core/utils.py`.
-  - Kết nối luồng thực thi trong `src/pipelines/phase1.py` và `src/pipelines/corruption_flow.py`.
-  - Kiểm tra tính nhất quán của các artifacts và theo dõi Contributor tracking trên GitHub nhánh `main`.
-- **Điều học được / Đóng góp chính:**
-  - Hiểu sâu sắc về thiết kế Idempotent Pipeline và quản lý trạng thái luồng dữ liệu đa tầng.
+### Mai Huy Hoàng — Data Cleaning & Pre-embed Modeling
 
-### ## HoVaTen2-MSSV2
-- **Vai trò:** Phụ trách Ingestion, Làm sạch & Phục hồi dữ liệu.
-- **Công việc chi tiết đã hoàn thành:**
-  - Xây dựng module thu thập Crossref API với cơ chế Fallback offline trong `src/ingestion/crossref.py`.
-  - Chuẩn hóa schema, tính toán trường `age_days` và `text_for_embedding` trong `src/ingestion/cleaning.py`.
-  - Thực thi cơ chế Idempotent Repair phục hồi dữ liệu từ raw snapshot.
-- **Điều học được / Đóng góp chính:**
-  - Kỹ thuật truy vết nguồn gốc dữ liệu (Data Lineage) và bảo toàn raw snapshot trước khi biến đổi.
+- Hoàn thiện `build_clean_dataframe()` trong `src/ingestion/cleaning.py`.
+- Chuẩn hóa whitespace/text, tính `age_days`, khử trùng lặp theo `paper_id` và tạo `text_for_embedding` từ title/authors/published/categories/summary.
+- Bàn giao `data/clean/papers_clean.csv` và `.json` với 24 dòng, 24 `paper_id` duy nhất.
+- Kiểm tra tương thích giữa schema clean, embedding/index và corruption flow.
 
-### ## HoVaTen3-MSSV3
-- **Vai trò:** Phụ trách RAG, Vector Database & Embedding.
-- **Công việc chi tiết đã hoàn thành:**
-  - Quản lý mô hình embedding `sentence-transformers/all-MiniLM-L6-v2`.
-  - Nạp và quản lý 3 collection riêng biệt trong ChromaDB (`papers-baseline`, `papers-corrupted`, `papers-repaired`).
-  - Xây dựng QA Agent truy vấn ngữ cảnh chính xác theo tài liệu.
-- **Điều học được / Đóng góp chính:**
-  - Cách cô lập các không gian vector để so sánh khách quan giữa dữ liệu sạch và dữ liệu bị lỗi.
+### Trần Nguyễn Trí Dũng — Benchmark Evaluation Test Set
 
-### ## HoVaTen4-MSSV4
-- **Vai trò:** Phụ trách Data Observability & Benchmark Evaluation.
-- **Công việc chi tiết đã hoàn thành:**
-  - Thiết lập Quality Gate theo chuẩn mới **Great Expectations 1.x** và giám sát Freshness SLA trong `src/observability/quality.py`.
-  - Xây dựng bộ câu hỏi đánh giá chuẩn trong `src/evaluation/testset.py`.
-  - Đo lường và xuất bảng đối chiếu 3 trạng thái vào `data/reports/corruption_report.md`.
-- **Điều học được / Đóng góp chính:**
-  - Cách thiết lập hệ thống cảnh báo sớm chặn đứng hiện tượng Silent Failure trước khi dữ liệu vào serving layer.
+- Hoàn thiện `build_test_set()` trong `src/evaluation/testset.py`.
+- Sinh 10 câu hỏi ground truth, phủ 4 loại `summary`, `authors`, `date`, `categories`; mỗi câu giữ DOI trong `ground_truth_doc_ids`.
+- Bàn giao `data/eval/test_set.json` và hỗ trợ xác minh metrics, cùng test set cho baseline/corrupted/repaired.
+- Đóng góp phân tích hiện tượng retrieval miss không nhất thiết làm answer sai và giới hạn của heuristic/LLM judge.
+
+### Nguyễn Đức Tâm — Observability, Corruption/Repair & Integration
+
+- Thiết lập Great Expectations 1.x Ephemeral Context, 6 expectations thực tế (row count, not-null, unique, summary length) và Freshness SLA 180 ngày/25%.
+- Điều phối `script/run_phase1.py`, `script/run_corruption_flow.py`, quality reports và comparison report.
+- Thực hiện 6 kịch bản corruption với seed 42, repair idempotent từ raw snapshot và tái đánh giá 3 trạng thái.
+- Bàn giao `data/quality/`, `data/results/`, `data/reports/phase1_report.md` và `data/reports/corruption_report.md`.
+
+## Kết quả nhóm đã xác nhận
+
+- Baseline: 24 dòng, 24 IDs duy nhất, GX 6/6, Freshness 0/24 stale, fingerprint `8b5b9cc5e8239eab`.
+- Corrupted: 22 dòng, 19 IDs duy nhất, GX 4/6, Freshness 8/22 stale (36.4%), fingerprint `7bf7953b239d393a`.
+- Repaired: 24 dòng, GX 6/6, Freshness 0/24 stale, fingerprint trùng baseline.
+- Metrics `retrieval_hit_rate`, `mean_token_f1`, `judge_accuracy`: `1.0 → 0.9 → 1.0`; `mean_judge_score`: `5.0 → 4.6 → 5.0`.
+
+Mỗi thành viên chịu trách nhiệm kiểm tra và ký xác nhận trong báo cáo cá nhân tương ứng. Các trải nghiệm cá nhân, khó khăn thực tế và ngày xác nhận được giữ ở từng file cá nhân để tránh ghi nhận đóng góp không có bằng chứng.
