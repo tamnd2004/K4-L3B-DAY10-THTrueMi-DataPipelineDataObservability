@@ -8,6 +8,12 @@ from langchain_openai import ChatOpenAI
 from core.config import Settings, normalized_provider, require_llm_credentials
 
 
+def _openai_supports_temperature(model_name: str) -> bool:
+    """Reasoning model OpenAI (o-series, gpt-5+ tru ban `-chat`) tra 400 neu temperature khac mac dinh."""
+    name = model_name.lower()
+    return "chat" in name or not name.startswith(("o1", "o3", "o4", "gpt-5", "gpt-6"))
+
+
 def build_llm(settings: Settings, temperature: float = 0.0):
     provider = normalized_provider(settings)
     require_llm_credentials(settings)
@@ -22,7 +28,7 @@ def build_llm(settings: Settings, temperature: float = 0.0):
         return ChatOpenAI(
             model=settings.model_name,
             api_key=settings.openai_api_key,
-            temperature=temperature,
+            temperature=temperature if _openai_supports_temperature(settings.model_name) else None,
         )
     if provider == "anthropic":
         return ChatAnthropic(

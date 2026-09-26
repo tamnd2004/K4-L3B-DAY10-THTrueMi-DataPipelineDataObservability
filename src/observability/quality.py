@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 from pathlib import Path
 from typing import Any
 
@@ -35,6 +36,17 @@ def evaluate_freshness_sla(df: pd.DataFrame, settings: Settings) -> dict[str, An
         "total_rows": total_rows,
         "stale_ratio": round(stale_ratio, 4),
         "is_fresh": total_rows > 0 and stale_ratio <= MAX_STALE_RATIO,
+    }
+
+
+def _dataset_profile(df: pd.DataFrame) -> dict[str, Any]:
+    """So dong va fingerprint noi dung (paper_id + text_for_embedding) de doi chieu version data giua cac lan chay."""
+    content = df.reindex(columns=["paper_id", "text_for_embedding"]).fillna("").astype(str)
+    rows = sorted(content.itertuples(index=False, name=None))
+    return {
+        "rows": len(df),
+        "unique_paper_ids": int(content["paper_id"].nunique()),
+        "fingerprint": hashlib.sha256(repr(rows).encode("utf-8")).hexdigest()[:16],
     }
 
 
@@ -90,6 +102,7 @@ def run_data_quality_checks(df: pd.DataFrame, settings: Settings, report_name: s
         "statistics": described["statistics"],
         "expectations": expectations,
         "freshness": freshness,
+        "dataset": _dataset_profile(df),
     }
     write_json(settings.paths.gx_dir / f"{report_name}_validation.json", validation.to_json_dict())
     write_json(settings.paths.quality_dir / f"{report_name}_quality_report.json", report)

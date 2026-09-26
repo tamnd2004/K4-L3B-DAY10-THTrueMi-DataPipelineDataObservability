@@ -25,6 +25,20 @@ def write_csv(df, path: Path) -> None:
     df.to_csv(path, index=False)
 
 
+def write_frame(df, csv_path: Path, json_path: Path) -> None:
+    """Luu dataframe ra ca CSV va JSON (list records) nhu cac artifact clean/corrupted/repaired."""
+    write_csv(df, csv_path)
+    write_json(json_path, df.to_dict(orient="records"))
+
+
+def display_path(path: Path, root: Path) -> str:
+    """Duong dan tuong doi (posix) de ghi log/report, khong lo duong dan tuyet doi cua may."""
+    try:
+        return path.relative_to(root).as_posix()
+    except ValueError:
+        return path.as_posix()
+
+
 def write_text(path: Path, text: str) -> None:
     ensure_parent(path)
     path.write_text(text, encoding="utf-8")

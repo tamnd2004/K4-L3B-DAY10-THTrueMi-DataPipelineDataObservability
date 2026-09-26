@@ -8,6 +8,19 @@ from core.utils import normalize_whitespace
 from ingestion.crossref import PaperRecord
 
 
+def build_embedding_text(
+    title: str, authors_joined: str, published: str, categories_joined: str, summary: str
+) -> str:
+    """Five-part embedding text; shared with corruption so rebuilt rows keep the exact same format."""
+    return (
+        f"Title: {title}\n"
+        f"Authors: {authors_joined}\n"
+        f"Published: {published}\n"
+        f"Categories: {categories_joined}\n"
+        f"Summary: {summary}"
+    )
+
+
 def build_clean_dataframe(records: list[PaperRecord], run_date: datetime) -> pd.DataFrame:
     """Normalize raw papers and prepare one embedding text per unique DOI."""
     columns = [
@@ -52,12 +65,8 @@ def build_clean_dataframe(records: list[PaperRecord], run_date: datetime) -> pd.
             "categories_joined": categories_joined,
             "summary_chars": len(summary),
             "age_days": (run_date.date() - published.date()).days,
-            "text_for_embedding": (
-                f"Title: {title}\n"
-                f"Authors: {authors_joined}\n"
-                f"Published: {published_date}\n"
-                f"Categories: {categories_joined}\n"
-                f"Summary: {summary}"
+            "text_for_embedding": build_embedding_text(
+                title, authors_joined, published_date, categories_joined, summary
             ),
         })
 

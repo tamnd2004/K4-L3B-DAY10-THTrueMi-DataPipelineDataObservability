@@ -1,0 +1,73 @@
+{
+  "report_name": "corrupted",
+  "checked_at": "2026-09-26T03:39:23.071845+00:00",
+  "great_expectations_version": "1.23.2",
+  "suite_name": "papers_corrupted_suite",
+  "success": false,
+  "gx_success": false,
+  "statistics": {
+    "evaluated_expectations": 6,
+    "successful_expectations": 4,
+    "unsuccessful_expectations": 2,
+    "success_percent": 66.66666666666666
+  },
+  "expectations": [
+    {
+      "expectation": "expect_table_row_count_to_be_between",
+      "column": null,
+      "success": true,
+      "observed_value": 22,
+      "unexpected_count": null
+    },
+    {
+      "expectation": "expect_column_values_to_not_be_null",
+      "column": "paper_id",
+      "success": true,
+      "observed_value": null,
+      "unexpected_count": 0
+    },
+    {
+      "expectation": "expect_column_values_to_be_unique",
+      "column": "paper_id",
+      "success": false,
+      "observed_value": null,
+      "unexpected_count": 6
+    },
+    {
+      "expectation": "expect_column_values_to_not_be_null",
+      "column": "title",
+      "success": true,
+      "observed_value": null,
+      "unexpected_count": 0
+    },
+    {
+      "expectation": "expect_column_values_to_not_be_null",
+      "column": "text_for_embedding",
+      "success": true,
+      "observed_value": null,
+      "unexpected_count": 0
+    },
+    {
+      "expectation": "expect_column_value_lengths_to_be_between",
+      "column": "summary",
+      "success": false,
+      "observed_value": null,
+      "unexpected_count": 3
+    }
+  ],
+  "freshness": {
+    "latest_published": "2026-08-26",
+    "oldest_published": "2025-05-06",
+    "threshold_days": 180,
+    "max_stale_ratio": 0.25,
+    "stale_rows": 8,
+    "total_rows": 22,
+    "stale_ratio": 0.3636,
+    "is_fresh": false
+  },
+  "dataset": {
+    "rows": 22,
+    "unique_paper_ids": 19,
+    "fingerprint": "7bf7953b239d393a"
+  }
+}

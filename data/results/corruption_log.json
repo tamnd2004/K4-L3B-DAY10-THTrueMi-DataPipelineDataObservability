@@ -1,0 +1,171 @@
+{
+  "created_at": "2026-09-26T03:39:22.953849+00:00",
+  "seed": 42,
+  "input_rows": 24,
+  "output_rows": 22,
+  "scenarios": [
+    {
+      "scenario": "drop_latest_records",
+      "description": "Drop 20% newest papers",
+      "affected_rows": 5,
+      "records": [
+        {
+          "paper_id": "10.21203/rs.3.rs-10489777/v1",
+          "title": "DOLPHIN: A Privacy-Preserving Digital Investigation Readiness Assessment Framework based on Offline Large Language Models and Retrieval-Augmented Generation",
+          "published": "2026-09-15"
+        },
+        {
+          "paper_id": "10.70267/aitia.2026482489",
+          "title": "Retrieval-Augmented Generation for Large Language Model-Based Intelligent Assistants: A Review",
+          "published": "2026-09-13"
+        },
+        {
+          "paper_id": "10.21203/rs.3.rs-10349437/v1",
+          "title": "Agentic Retrieval-Augmented Generation for Verifiable Regulatory Compliance in Urban Cyber-Physical Systems",
+          "published": "2026-09-12"
+        },
+        {
+          "paper_id": "10.54254/2755-2721/2026.36624",
+          "title": "Advances in Reinforcement Learning for Retrieval-Augmented Generation in Large Language Model",
+          "published": "2026-09-08"
+        },
+        {
+          "paper_id": "10.36887/2415-8453-2026-3-2",
+          "title": "Intelligent automation of economic processes based on retrieval-augmented generation and large language models",
+          "published": "2026-09-04"
+        }
+      ]
+    },
+    {
+      "scenario": "blank_summary",
+      "description": "Set summary to an empty string",
+      "affected_rows": 3,
+      "records": [
+        {
+          "paper_id": "10.3390/buildings16132637",
+          "summary_chars_before": 2207
+        },
+        {
+          "paper_id": "10.52060/juptik.v4i1.4318",
+          "summary_chars_before": 1095
+        },
+        {
+          "paper_id": "10.20944/preprints202604.0339.v1",
+          "summary_chars_before": 1687
+        }
+      ]
+    },
+    {
+      "scenario": "inject_noise",
+      "description": "Insert random junk tokens after ~25% of summary words",
+      "affected_rows": 3,
+      "records": [
+        {
+          "paper_id": "10.21203/rs.3.rs-10178277/v1",
+          "noise_tokens": 50,
+          "summary_after": "Abstract Time-series foundation TgM#e8 models and retrieval-based augmentation have recently emerged 5zGIdM as relevant "
+        },
+        {
+          "paper_id": "10.21079/11681/50309",
+          "noise_tokens": 27,
+          "summary_after": "The US tU^bUj Army TV#8cr Corps q724nb of Engineers @aakd5 (USACE) Civil Qu7reU Works (CW) research and development 4Foh"
+        },
+        {
+          "paper_id": "10.21203/rs.3.rs-10012178/v1",
+          "noise_tokens": 76,
+          "summary_after": "Abstract Enterprise adoption of artificial intelligence (AI) systems, including Generative SJZ4ET AI (GenAI), Retrieval-"
+        }
+      ]
+    },
+    {
+      "scenario": "truncate_title",
+      "description": "Cut title to 7 characters",
+      "affected_rows": 3,
+      "records": [
+        {
+          "paper_id": "10.3390/knowledge6030022",
+          "title_before": "Integrating Retrieval-Augmented Generation with Large Language Model for Robust and Explainable AI Text Detection",
+          "title_after": "Integra"
+        },
+        {
+          "paper_id": "10.1007/s10278-026-02086-9",
+          "title_before": "JADE-Plus: A Multimodal Agentic Retrieval-Augmented Generation Large Language Framework for Diagnostic Support in Jawbone Lesions: Development and Technical Validation Study",
+          "title_after": "JADE-Pl"
+        },
+        {
+          "paper_id": "10.63125/gseh0k17",
+          "title_before": "A Foundation Model Architecture for Supply Chain Risk Prediction: Integrating Large Language Models and Retrieval-Augmented Generation for Automated Disruption Alerting",
+          "title_after": "A Found"
+        }
+      ]
+    },
+    {
+      "scenario": "stale_date",
+      "description": "Shift published date back 365 days",
+      "affected_rows": 6,
+      "records": [
+        {
+          "paper_id": "10.28932/jutisi.v12i2.13099",
+          "published_before": "2026-08-27",
+          "published_after": "2025-08-27",
+          "age_days_before": 30,
+          "age_days_after": 395
+        },
+        {
+          "paper_id": "10.21203/rs.3.rs-10423755/v1",
+          "published_before": "2026-08-26",
+          "published_after": "2025-08-26",
+          "age_days_before": 31,
+          "age_days_after": 396
+        },
+        {
+          "paper_id": "10.36948/ijfmr.2026.v08i04.85777",
+          "published_before": "2026-08-14",
+          "published_after": "2025-08-14",
+          "age_days_before": 43,
+          "age_days_after": 408
+        },
+        {
+          "paper_id": "10.2118/234689-pa",
+          "published_before": "2026-08-01",
+          "published_after": "2025-08-01",
+          "age_days_before": 56,
+          "age_days_after": 421
+        },
+        {
+          "paper_id": "10.63646/kpqm1958",
+          "published_before": "2026-06-30",
+          "published_after": "2025-06-30",
+          "age_days_before": 88,
+          "age_days_after": 453
+        },
+        {
+          "paper_id": "10.55041/isjem07213",
+          "published_before": "2026-05-06",
+          "published_after": "2025-05-06",
+          "age_days_before": 143,
+          "age_days_after": 508
+        }
+      ]
+    },
+    {
+      "scenario": "duplicate_rows",
+      "description": "Append exact copies of rows",
+      "affected_rows": 3,
+      "records": [
+        {
+          "paper_id": "10.21203/rs.3.rs-10423755/v1",
+          "title": "Evidence Constrained Agentic Retrieval Augmented Generation for Substation Civil Engineering Preliminary Design Documents in a Single Project Study"
+        },
+        {
+          "paper_id": "10.36948/ijfmr.2026.v08i04.85777",
+          "title": "A Framework for Adaptive Knowledge-Augmented Mizo Large Language Models Using Retrieval-Augmented Generation and Continual Learning"
+        },
+        {
+          "paper_id": "10.47576/2949-1894.2026.7.7.023",
+          "title": "\u0421\u043d\u0438\u0436\u0435\u043d\u0438\u0435 \u0440\u0438\u0441\u043a\u043e\u0432 \u043f\u0440\u0438\u043c\u0435\u043d\u0435\u043d\u0438\u044f LLM (Large Language Model) \u0432 \u0441\u0444\u0435\u0440\u0435 \u044d\u043a\u043e\u043d\u043e\u043c\u0438\u0447\u0435\u0441\u043a\u043e\u0439 \u0431\u0435\u0437\u043e\u043f\u0430\u0441\u043d\u043e\u0441\u0442\u0438 \u043f\u0440\u0435\u0434\u043f\u0440\u0438\u044f\u0442\u0438\u0439 \u043c\u043e\u043b\u043e\u0447\u043d\u043e\u0439 \u043f\u0440\u043e\u043c\u044b\u0448\u043b\u0435\u043d\u043d\u043e\u0441\u0442\u0438 \u043d\u0430 \u043e\u0441\u043d\u043e\u0432\u0435 \u043f\u043e\u0434\u0445\u043e\u0434\u0430 RAG (Retrieval-Augmented Generation)"
+        }
+      ]
+    }
+  ]
+}

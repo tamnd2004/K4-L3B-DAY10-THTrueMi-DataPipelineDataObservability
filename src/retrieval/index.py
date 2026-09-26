@@ -8,7 +8,7 @@ import chromadb
 import pandas as pd
 
 from core.config import Settings
-from core.utils import read_json, safe_slug, write_json
+from core.utils import display_path, read_json, safe_slug, write_json
 from retrieval.embeddings import MiniLMEmbeddings
 
 
@@ -116,7 +116,7 @@ class LocalEmbeddingIndex:
             {
                 "backend": "chroma",
                 "embedding_model": settings.embedding_model,
-                "persist_path": str(persist_path),
+                "persist_path": display_path(persist_path, settings.paths.project_dir),
                 "collection_name": collection_name,
                 "documents": documents,
             },
@@ -135,7 +135,7 @@ class LocalEmbeddingIndex:
             settings=settings,
             collection_name=payload["collection_name"],
             documents=payload["documents"],
-            persist_path=Path(payload["persist_path"]),
+            persist_path=settings.paths.project_dir / payload["persist_path"],
         )
 
     def search(self, query: str, top_k: int | None = None) -> list[SearchResult]:
